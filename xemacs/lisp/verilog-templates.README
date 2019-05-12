@@ -1,0 +1,9 @@
+Templates for writing Verilog/SystemVerilog (UVM) files.
+
+To install, add the following lines to your .emacs / init.el (XEmacs):
+
+;; My Verilog templates accessible via the Verilog->Insert Template menu
+(setq verilog-template-dir "/home/thorsten/data/lisp/")
+(load-file (concat verilog-template-dir "verilog-templates.el"))
+
+(c) Thorsten Dworzak, MAR/2015

@@ -1,0 +1,25 @@
+#!/usr/bin/ruby
+#
+# Frontend for PointBreak module
+#
+# usage: pointbreak_sv <cache-file-name>
+#
+
+$LOAD_PATH << "/home/chdworza/work/ruby"
+
+require 'PointBreak'
+
+class Pb
+   include PointBreak
+   def initialize
+      super
+      if ARGV.size == 1
+         @output_filename = ARGV[0]
+      end
+   end
+end
+
+pb = Pb.new
+pb.create_breakpoint()
+
+# end
