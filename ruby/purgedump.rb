@@ -1,7 +1,10 @@
 #!/usr/bin/ruby
 #
-# Removes all files in directories matching patterns <dir_patterns>
+# Author: Thorsten Dworzak
+# 
+# Description: Removes all files in directories matching patterns <dir_patterns>
 # and below that are older than <days>.
+# TODO: use config file to define directories, patterns, days
 #
 
 #
@@ -26,18 +29,16 @@ ack_patterns = [
 ]
 
 if ENV["WORKAREA"]
+  dir_patterns.push(
+    {"#{ENV["MY_REGRESSION_AREA"]}"                               => ies_patterns}
+  )
+end
+
+if ENV["IRIS_VERIFICATION"]
   # project dependent directories to purge
   dir_patterns.push(
-    {"#{ENV["WORKAREA"]}/units/tb_ig32_ack/simulation"                   => ies_patterns},
-    {"#{ENV["WORKAREA"]}/units/tb_ig32_ack/simulation/ncsim/INCA*libs"   => ["*"]},
-    {"#{ENV["WORKAREA"]}/units/ig32_cpu/simulation"                      => ies_patterns},
-    {"#{ENV["WORKAREA"]}/units/ig32_cpu/simulation/ncsim/INCA*libs"      => ["*"]},
-    {"#{ENV["AVKRUN_HOME"]}/../*/jobs"        => ["*"]},
-    {"#{ENV["AVKRUN_HOME"]}/../*/suites"      => ["*"]},
-    {"#{ENV["AVKRUN_HOME"]}/../*/tests"       => ["*"]},
-    {"#{ENV["AVKRUN_HOME"]}/../*/"            => ack_patterns},
-    {"#{ENV["WORKAREA"]}/units/ig32_cpu/source/sc/models/win_release_*"  => ["*"]},
-    {"/opt/tmp_share/#{ENV["USER"]}/val_tmp/*.VAL"                       => ["*"]}
+    {"#{ENV["IRIS_VERIFICATION"]}/tb/e/fme_iris_mgp"              => ies_patterns },
+    {"#{ENV["IRIS_VERIFICATION"]}/tb/e/fme_iris_mgp/*/INCA_libs"  => ["*"] }
   )
 end
 
