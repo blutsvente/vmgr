@@ -1,15 +1,14 @@
 {
 	"caret_style": "solid",
-	"color_scheme": "Packages/Color Scheme - Default/Mariana.tmTheme",
-	"ensure_newline_at_eof_on_save": true,
-	"font_face": "lucidatypewriter",
-	"font_size": 9,
+	"color_scheme": "Packages/Theme - Toxin/Toxin.tmTheme",
+	"default_line_ending": "unix",
+	"font_face": "Inconsolata",
+	"font_size": 12,
 	"highlight_modified_tabs": true,
 	"ignored_packages":
 	[
 		"Vintage"
 	],
-	"indent_to_bracket": true,
 	"match_brackets_content": false,
 	"tab_size": 3,
 	"theme": "Default.sublime-theme",

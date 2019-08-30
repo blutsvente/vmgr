@@ -26,25 +26,25 @@
                 <key>name</key>
                 <string>TM_ORGANIZATION_NAME</string>
                 <key>value</key>
-                <string><![CDATA[Infineon Technologies AG]]></string>
+                <string><![CDATA[Cypress Semiconductor]]></string>
             </dict>
             <dict>
                 <key>name</key>
                 <string>TM_DEPARTMENT_NAME</string>
                 <key>value</key>
-                <string><![CDATA[CCS TI PD VER]]></string>
+                <string><![CDATA[GCC]]></string>
             </dict>
             <dict>
                 <key>name</key>
                 <string>TM_PROJECT_NAME</string>
                 <key>value</key>
-                <string><![CDATA[ig32]]></string>
+                <string><![CDATA[fme_iris_env]]></string>
             </dict>
             <dict>
                 <key>name</key>
                 <string>TM_YEAR</string>
                 <key>value</key>
-                <string><![CDATA[2018]]></string>
+                <string><![CDATA[2019]]></string>
             </dict>
         </array>
     </dict>
