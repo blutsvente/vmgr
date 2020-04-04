@@ -1,0 +1,79 @@
+//
+// Written by NGen Library ver.1.2.6 2019-07-31 18:34:39
+//
+
+header vsof {
+        runner_version : <text>2</text> ;
+        version : <text>3</text> ;
+        vmanager_version : <text>10.20.xxx-yyy</text> ;
+}
+
+session_output "sysc_wrapper__videoio_tb" {
+        original_session_dir : <text>/proj/gpfs/thdx/workspaces/thdx_mxvideoss_dev4m_2/vmanager_sessions/fme_iris_mgp/iris_mgp_regression.thdx.19_07_31_18_30_00_8273/cov/scope</text>;
+        runs_in_session : 1;
+        session_description : <text>Single run of 'sysc_wrapper__videoio_tb', e test 'iris_reset_display0' using seed 1</text>;
+        session_dir : <text>/proj/gpfs/thdx/workspaces/thdx_mxvideoss_dev4m_2/vmanager_sessions/fme_iris_mgp/iris_mgp_regression.thdx.19_07_31_18_30_00_8273/cov/scope</text>;
+        session_end_time : <text>1564590879</text>;
+        session_name : <text>sysc_wrapper__videoio_tb</text>;
+        session_owner : <text>thdx</text>;
+        session_start_time : <text>1564590660</text>;
+        session_status : <text>post_session_script_done</text>;
+        session_type : <text>single_run</text>;
+        top_dir : <text>$ATTR(session_dir)/..</text>;
+}
+
+run 1 {
+        cpu_time : 215411;
+        end_time : <text>1564590879</text>;
+        engine : <text>ncsim specman</text>;
+        full_title : <text>sysc_wrapper__videoio_tb/iris_reset_display0</text>;
+        log_file : <text>/proj/gpfs/thdx/workspaces/thdx_mxvideoss_dev4m_2/vmanager_sessions/fme_iris_mgp/iris_mgp_regression.thdx.19_07_31_18_30_00_8273/cov/scope/test_10/irun.log</text>;
+        original_test_path : <text>iris_reset_display0</text>;
+        parent_run : <text>/proj/gpfs/thdx/workspaces/thdx_mxvideoss_dev4m_2/vmanager_sessions/fme_iris_mgp/iris_mgp_regression.thdx.19_07_31_18_30_00_8273/iris_mgp_regression.vsof:iris_mgp_regression/special/iris_reset_display0@9</text>;
+        run_dir : <text>/proj/gpfs/thdx/workspaces/thdx_mxvideoss_dev4m_2/vmanager_sessions/fme_iris_mgp/iris_mgp_regression.thdx.19_07_31_18_30_00_8273/cov/scope/test_10</text>;
+        run_id : 1;
+        run_type : <text>simulation</text>;
+        seed : 1;
+        simulation_time : 1041424178000;
+        simulator : <text>ncsim</text>;
+        system_time : 687;
+        test_name : <text>iris_reset_display0</text>;
+        top_files : <text>/proj/gpfs/thdx/workspaces/thdx_mxvideoss_dev4m_2/vvideoio/tb/e/fme_iris_mgp/tests/iris_reset_display0.e</text>;
+        user_time : 214723;
+
+        filter "ncsim" {
+                filter_files : <text>ius.flt ovm_sv_lib.flt</text>;
+                filter_id : <text>ncsim</text>;
+                log_file : <text>/proj/gpfs/thdx/workspaces/thdx_mxvideoss_dev4m_2/vmanager_sessions/fme_iris_mgp/iris_mgp_regression.thdx.19_07_31_18_30_00_8273/cov/scope/test_10/irun.log</text>;
+        }
+
+        filter "specman" {
+                filter_files : <text>specman.flt</text>;
+                filter_id : <text>specman</text>;
+                log_file : <text>/proj/gpfs/thdx/workspaces/thdx_mxvideoss_dev4m_2/vmanager_sessions/fme_iris_mgp/iris_mgp_regression.thdx.19_07_31_18_30_00_8273/cov/scope/test_10/irun.log</text>;
+        }
+
+        coverage_model "specman" {
+                tool_name : <text>specman</text>;
+                ucm_checksum : <text>00000000_3fae4014</text>;
+                ucm_file : <text>/proj/gpfs/thdx/workspaces/thdx_mxvideoss_dev4m_2/vmanager_sessions/fme_iris_mgp/iris_mgp_regression.thdx.19_07_31_18_30_00_8273/model_dir/sn_00000000_3fae4014.ucm</text>;
+        }
+
+        coverage_data "specman" {
+                tool_name : <text>specman</text>;
+                ucd_file : <text>/proj/gpfs/thdx/workspaces/thdx_mxvideoss_dev4m_2/vmanager_sessions/fme_iris_mgp/iris_mgp_regression.thdx.19_07_31_18_30_00_8273/cov/scope/test_10/sn_00000000_3fae4014.ucd</text>;
+                ucm_checksum : <text>00000000_3fae4014</text>;
+        }
+
+        coverage_model "ncsim" {
+                tool_name : <text>ncsim</text>;
+                ucm_checksum : <text>52e7832f_0ea238b5</text>;
+                ucm_file : <text>/proj/gpfs/thdx/workspaces/thdx_mxvideoss_dev4m_2/vmanager_sessions/fme_iris_mgp/iris_mgp_regression.thdx.19_07_31_18_30_00_8273/model_dir/icc_52e7832f_0ea238b5.ucm</text>;
+        }
+
+        coverage_data "ncsim" {
+                tool_name : <text>ncsim</text>;
+                ucd_file : <text>/proj/gpfs/thdx/workspaces/thdx_mxvideoss_dev4m_2/vmanager_sessions/fme_iris_mgp/iris_mgp_regression.thdx.19_07_31_18_30_00_8273/cov/scope/test_10/icc_52e7832f_0ea238b5.ucd</text>;
+                ucm_checksum : <text>52e7832f_0ea238b5</text>;
+        }
+}

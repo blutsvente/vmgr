@@ -2,8 +2,8 @@
 # $Id:$
 #
 # Diff a working copy of a subversion-managed file to its previous revision
-# using the specified comparison tool (-m option). Depending on whether the 
-# working copy is modified, it will automatically compare it against the BASE 
+# using the specified comparison tool (-m option). Depending on whether the
+# working copy is modified, it will automatically compare it against the BASE
 # revision or the PREV revision.
 # Alternatively you diff against specified revision (-r option).
 #
@@ -34,7 +34,7 @@ file=
 tool_select=
 use_specific_revision=0
 for opt in $opts; do
-    case "$1" in 
+    case "$1" in
         -t|-tool|--diff-program) tool_select=$2; shift 2 ;; # --diff-program can be used by svn diff if configured, see config
         -r|-revision) revision=$2; shift 2; use_specific_revision=1;;
         -h|-help) printf '%s\n' "$(usage)"; exit 0;;
@@ -49,7 +49,7 @@ if [ -z "$file" ]; then
 fi
 
 if [ -n "$tool_select" ]; then
-    case "$tool_select" in 
+    case "$tool_select" in
         m) tool="meld";;
         k) tool="kompare";;
         n) tool=$native_diff;;
@@ -61,6 +61,12 @@ fi
 if [ ! -r "$file" ]; then
     echo $this: ERROR: file does not exist
     exit 1
+fi
+
+# Warn if link because it is maybe not what you want
+if [ -L "$file" ]; then
+    echo $this: WARNING: file is a symbolic link
+    \ls -l "$file"
 fi
 
 current_str=
@@ -90,7 +96,7 @@ if [ $? -eq 0 ]; then
     $tool $file $outfile
     \rm -f $outfile
 else
-    echo $this: ERROR, aborting.
+    echo $this: ERROR from command \"$tool\", aborting.
     exit 1
 fi
 exit 0

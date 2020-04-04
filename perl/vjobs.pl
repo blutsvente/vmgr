@@ -20,8 +20,8 @@ our($usage) = "$0 [<pattern>] - show progress bar on LSF jobs by grepping bjobs 
 use strict;
 use warnings;
 use FindBin qw($Bin);
-use lib "/home/chdworza/work/perl";
-use lib "/home/chdworza/work/perl/lib/site_perl/5.16.2";
+# use lib "/home/chdworza/work/perl";
+# use lib "/home/chdworza/work/perl/lib/site_perl/5.16.2";
 use lib "$Bin/lib/site_perl/5.16.2";
 require Term::Screen;
 require toolbox;
@@ -52,14 +52,25 @@ my $timeout = 0;
 my $n = 0;
 my $n_last;
 my $bjobs_output;
+my $pend_avg = 0;
+my $run_avg = 0;
+my $samples = 0;
 
 while(1) {
    $n_last = $n;
-   if (toolbox::ext_system("bjobs | grep -e '$pattern'", \$bjobs_output, 0) > 1) {
+   #if (toolbox::ext_system("bjobs | grep -e '$pattern'", \$bjobs_output, 0) > 1) {
+   if (toolbox::ext_system("bjobs -w", \$bjobs_output, 0) > 1) {
       print "Some problem occurred.\n";
       goodbye();
    } else {
-      my @lbjobs_output = split(/\s*\n/, $bjobs_output);
+      my @ltemp = split(/\s*\n/, $bjobs_output);
+      my @lbjobs_output = ();
+
+      foreach my $line (@ltemp) {
+         if ($line =~ /$pattern/) {
+            push @lbjobs_output, $line;
+         }
+      }
       $n = scalar(@lbjobs_output);
       my $pend = scalar(grep ($_ =~ /\bPEND\b/, @lbjobs_output));
       my $run = scalar(grep ($_ =~ /\bRUN\b/, @lbjobs_output));
@@ -74,11 +85,14 @@ while(1) {
       }
       $scr->clrscr();
       $scr->resize();
-
+      $pend_avg = $pend_avg + ($pend - $pend_avg) / ($samples + 1);
+      $run_avg = $run_avg + ($run - $run_avg) / ($samples + 1);
       my $d = ($n - $n_last);
-      print "LSF PEND+RUN jobs matching \"$pattern\": <${pend}+${run}> delta: <$d>";
+      my $avg_str = sprintf("<PEND %.1f RUN %.1f>", $pend_avg, $run_avg);
+      print "LSF jobs matching \"$pattern\": <PEND ${pend} RUN ${run}> avg: $avg_str delta: <$d>";
       render_bars($pend, $run);
       sleep _SLEEP_SECONDS_;
+      $samples ++;
    }
 }
 

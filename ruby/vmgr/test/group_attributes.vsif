@@ -1,0 +1,17 @@
+// include file: common group attributes for .vsif files
+
+dut_name                   : "iris_mgp";
+sve_name                   : "";
+pre_group_script           : "";
+run_script                 : $ENV(FME_IRIS_MGP_PACKAGE_DIR)/vm/brun_run_ncsim.sh;
+pre_commands               : "";
+post_run_script            : "";
+timeout                    : 4000;             // Timeout for run in seconds
+test_command               : test;             // set if no "test" in SPECMAN_PRE_COMMANDS
+run_mode                   : batch;            // batch|interactive
+//scan_script                : $ENV(VMANAGER_HOME)/bin/vm_scan.pl -maxpat 100000 $ENV(VMANAGER_HOME)/bin/ies.flt $ENV(VMANAGER_HOME)/bin/shell.flt $ENV(VMANAGER_CONFIG_HOME)/iris.flt;
+auto_scan_args             : $ENV(VMANAGER_HOME)/bin/shell.flt $ENV(VMANAGER_HOME)/bin/specman.flt $ENV(VMANAGER_CONFIG_HOME)/iris.flt;
+seed                       : random;
+sv_seed                    : 1;
+
+// end

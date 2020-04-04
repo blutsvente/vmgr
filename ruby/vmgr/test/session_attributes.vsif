@@ -1,0 +1,14 @@
+// include file: common session attributes for .vsif files
+top_dir                          : $ENV(MY_REGRESSION_AREA)/fme_iris_mgp;
+drm                              : "lsf";
+//master_submission_policy         : execute_locally;
+queuing_policy                   : round_robin;     // vsif_order, short2long, long2short, round_robin
+//default_dispatch_parameters      : <text>-q normal_20 -Lp Traveo2_MXVIDEOSS $ENV(VMGR_LSF_RESOURCE)</text>;
+//pre_session_dispatch_parameters  : <text>-q batch</text>;
+//post_session_dispatch_parameters : <text>-q batch</text>;
+pre_session_script               : $ENV(VMANAGER_CONFIG_HOME)/brun_build_ncsim.sh;
+max_runs_in_parallel             : 16;
+post_session_drm                 : "lsf";
+post_session_script              : $ENV(VMANAGER_CONFIG_HOME)/brun_post_session.sh;
+
+// end

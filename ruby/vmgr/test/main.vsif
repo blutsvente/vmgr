@@ -1,0 +1,184 @@
+// main.vsif
+session iris_mgp_regression {
+    #include "session_attributes.vsif"
+    session_description: <text>regression containing complete set of available testcases</text>;
+};
+
+group registers {
+    #include "group_attributes.vsif"
+
+    test reg_irq    { top_files: "fme_iris_mgp/tests/new_irq_test.e";  count: 1; };
+    test reg_reset  { top_files: "fme_iris_mgp/tests/regs_reset.e";    count: 1; };
+    test mems_rw    { top_files: "fme_iris_mgp/tests/mems_rw.e";       count: 0; }; // THDX test is subset of regs_wr.e, no need to run
+    test reg_mem_rw { top_files: "fme_iris_mgp/tests/regs_rw.e";       count: 5; };
+    test ahb_random { top_files: "fme_iris_mgp/tests/ahb_rw.e";        count: 30; };
+};
+
+group display_controller0 {
+    #include "group_attributes.vsif"
+
+    count: 24;
+
+    test disp0_static                             { top_files: "fme_iris_mgp/tests/disp0_static_test.e"; };
+    test disp0_static_safety_test                 { top_files: "fme_iris_mgp/tests/disp0_static_safety_test.e"; auto_scan_args: "$ENV(FME_IRIS_MGP_PACKAGE_DIR)/vm/safety_ignore_ram_error.flt"; };
+    test disp0_static_tcon                        { top_files: "fme_iris_mgp/tests/disp0_static_tcon_test.e"; };
+    test disp0_static_tcon_hvsync                 { top_files: "fme_iris_mgp/tests/disp0_static_tcon_hvsync_test.e"; count: 5; };
+    test disp0_static_loopback                    { top_files: "fme_iris_mgp/tests/disp0_static_loopback.e"; count: 5; };
+    test disp0_dynamic                            { top_files: "fme_iris_mgp/tests/disp0_dynamic_test.e"; };
+    test disp0_dynamic_safety                     { top_files: "fme_iris_mgp/tests/disp0_dynamic_safety_test.e"; auto_scan_args: "$ENV(FME_IRIS_MGP_PACKAGE_DIR)/vm/safety_ignore_ram_error.flt"; };
+    test disp0_dynamic_rerun                      { top_files: "fme_iris_mgp/tests/disp0_dynamic_rerun_test.e"; count: 5;};
+    test disp0_dynamic_auto                       { top_files: "fme_iris_mgp/tests/disp0_dynamic_auto_test.e"; };
+    test disp0_dynamic_warp                       { top_files: "fme_iris_mgp/tests/disp0_dynamic_warp_test.e"; };
+    test disp0_dynamic_sig                        { top_files: "fme_iris_mgp/tests/disp0_dynamic_sig_test.e"; count: 30; };
+    test disp0_dynamic_histo                      { top_files: "fme_iris_mgp/tests/disp0_dynamic_histo_test.e"; };
+    test disp0_dynamic_decode                     { top_files: "fme_iris_mgp/tests/disp0_dynamic_decode_test.e"; count: 5; };
+    test disp0_dynamic_dump                       { top_files: "fme_iris_mgp/tests/disp0_dynamic_dump_test.e"; };
+    test disp0_dynamic_dump_error                 { top_files: "fme_iris_mgp/tests/disp0_dynamic_dump_error_test.e"; count: 2;};
+    test disp0_dynamic_capture                    { top_files: "fme_iris_mgp/tests/disp0_dynamic_capture_test.e"; };
+    test disp0_dynamic_capture_mipi               { top_files: "fme_iris_mgp/tests/disp0_dynamic_capture_mipi_test.e"; count: 5; };
+    test disp0_dynamic_auto_capture               { top_files: "fme_iris_mgp/tests/disp0_dynamic_auto_capture_test.e"; };
+    test disp0_dynamic_low_perf                   { top_files: "fme_iris_mgp/tests/disp0_dynamic_low_perf_test.e"; };
+    test disp0_dynamic_clk_throttling_test        { top_files: "fme_iris_mgp/tests/disp0_dynamic_clk_throttling_test.e"; };
+    test disp0_dynamic_bob                        { top_files: "fme_iris_mgp/tests/disp0_dynamic_bob_deinterlace_test.e"; count: 5; };
+    test disp0_dynamic_ringbuffer                 { top_files: "fme_iris_mgp/tests/disp0_dynamic_ringbuffer_test.e"; count: 5; };
+    test disp0_dual_dynamic                       { top_files: "fme_iris_mgp/tests/disp0_dual_dynamic_test.e"; };
+    test disp0_dual_dynamic_safety_test           { top_files: "fme_iris_mgp/tests/disp0_dual_dynamic_safety_test.e"; count: 5; };
+    test disp0_dual_dynamic_auto                  { top_files: "fme_iris_mgp/tests/disp0_dual_dynamic_auto_test.e"; seed: 1; count: 1; }; // does not pass reliably
+    test disp0_dual_dynamic_ringbuffer_bob_down   { top_files: "fme_iris_mgp/tests/disp0_dual_dynamic_ringbuffer_bob_down_test.e"; count: 10; timeout: 46800; };
+    test disp0_dual_dynamic_ringbuffer_enc        { top_files: "fme_iris_mgp/tests/disp0_dual_dynamic_ringbuffer_enc_test.e";      count: 10; timeout: 46800; };
+    test disp0_dual_dynamic_frame_rate_conversion { top_files: "fme_iris_mgp/tests/disp0_dual_dynamic_frame_rate_conversion.e";    count: 10; timeout: 46800; };
+    // Testcase foreseen for power testing, currently not maintained
+    //test disp0_dual_dynamic_blit                { top_files: "fme_iris_mgp/tests/obsolete/disp0_dual_dynamic_blit_test.e"; };
+    test disp0_dual_screen                        { top_files: "fme_iris_mgp/tests/disp0_dual_screen_test.e"; count: 8;  };
+    test disp0_dual_view                          { top_files: "fme_iris_mgp/tests/disp0_dual_view_test.e"; };
+};
+
+group display_controller1 {
+    #include "group_attributes.vsif"
+
+    count: 24;
+
+    test disp1_static                             { top_files: "fme_iris_mgp/tests/disp1_static_test.e"; };
+    test disp1_static_safety_test                 { top_files: "fme_iris_mgp/tests/disp1_static_safety_test.e"; auto_scan_args: "$ENV(FME_IRIS_MGP_PACKAGE_DIR)/vm/safety_ignore_ram_error.flt"; };
+    test disp1_static_tcon                        { top_files: "fme_iris_mgp/tests/disp1_static_tcon_test.e"; };
+    test disp1_static_tcon_hvsync                 { top_files: "fme_iris_mgp/tests/disp1_static_tcon_hvsync_test.e"; count: 5; };
+    test disp1_static_loopback                    { top_files: "fme_iris_mgp/tests/disp1_static_loopback.e"; count: 5; };
+    test disp1_dynamic                            { top_files: "fme_iris_mgp/tests/disp1_dynamic_test.e"; };
+    test disp1_dynamic_safety                     { top_files: "fme_iris_mgp/tests/disp1_dynamic_safety_test.e"; auto_scan_args: "$ENV(FME_IRIS_MGP_PACKAGE_DIR)/vm/safety_ignore_ram_error.flt"; };
+    test disp1_dynamic_rerun                      { top_files: "fme_iris_mgp/tests/disp1_dynamic_rerun_test.e"; count: 5;};
+    test disp1_dynamic_auto                       { top_files: "fme_iris_mgp/tests/disp1_dynamic_auto_test.e"; };
+    test disp1_dynamic_warp                       { top_files: "fme_iris_mgp/tests/disp1_dynamic_warp_test.e"; };
+    test disp1_dynamic_sig                        { top_files: "fme_iris_mgp/tests/disp1_dynamic_sig_test.e"; count: 30; };
+    test disp1_dynamic_histo                      { top_files: "fme_iris_mgp/tests/disp1_dynamic_histo_test.e"; };
+    test disp1_dynamic_decode                     { top_files: "fme_iris_mgp/tests/disp1_dynamic_decode_test.e"; count: 5; };
+    test disp1_dynamic_dump                       { top_files: "fme_iris_mgp/tests/disp1_dynamic_dump_test.e"; };
+    test disp1_dynamic_capture                    { top_files: "fme_iris_mgp/tests/disp1_dynamic_capture_test.e"; };
+    test disp1_dynamic_capture_mipi               { top_files: "fme_iris_mgp/tests/disp1_dynamic_capture_mipi_test.e"; count: 5; };
+    test disp1_dynamic_auto_capture               { top_files: "fme_iris_mgp/tests/disp1_dynamic_auto_capture_test.e"; };
+    test disp1_dynamic_clk_throttling_test        { top_files: "fme_iris_mgp/tests/disp1_dynamic_clk_throttling_test.e"; };
+    test disp1_dynamic_bob                        { top_files: "fme_iris_mgp/tests/disp1_dynamic_bob_deinterlace_test.e"; count: 5; };
+    test disp1_dual_dynamic                       { top_files: "fme_iris_mgp/tests/disp1_dual_dynamic_test.e"; };
+    test disp1_dual_dynamic_safety_test           { top_files: "fme_iris_mgp/tests/disp1_dual_dynamic_safety_test.e"; count: 5; };
+    test disp1_dual_dynamic_auto                  { top_files: "fme_iris_mgp/tests/disp1_dual_dynamic_auto_test.e"; seed: 1; count: 1; }; // does not pass reliably
+    test disp1_dual_dynamic_ringbuffer_bob_down   { top_files: "fme_iris_mgp/tests/disp1_dual_dynamic_ringbuffer_bob_down_test.e"; count: 10; timeout: 46800; };
+    test disp1_dual_dynamic_ringbuffer_enc        { top_files: "fme_iris_mgp/tests/disp1_dual_dynamic_ringbuffer_enc_test.e";      count: 10; timeout: 46800; };
+    // Testcase foreseen for power testing, currently not maintained
+    //test disp1_dual_dynamic_blit                { top_files: "fme_iris_mgp/tests/disp1_dual_dynamic_blit_test.e"; };
+    test disp1_dual_screen                        { top_files: "fme_iris_mgp/tests/disp1_dual_screen_test.e"; count: 8;  };
+    test disp1_dual_view                          { top_files: "fme_iris_mgp/tests/disp1_dual_view_test.e"; };
+};
+
+group capture_controller0 {
+    #include "group_attributes.vsif"
+
+    count: 5;
+
+    test storage0_test                { top_files: "fme_iris_mgp/tests/storage0_test.e"; count: 10; };
+    test storage0_singleframe         { top_files: "fme_iris_mgp/tests/storage0_singleframe_test.e"; };
+    test storage0_singleframe_new     { top_files: "fme_iris_mgp/tests/storage0_singleframe_new_test.e"; };
+    test storage0_ringbuffer          { top_files: "fme_iris_mgp/tests/storage0_ringbuffer_test.e"; count: 10; };
+    test storage0_encode_test         { top_files: "fme_iris_mgp/tests/storage0_encode_test.e";};
+    test storage0_scale_test          { top_files: "fme_iris_mgp/tests/storage0_scale_test.e";};
+    test storage0_scale_cov           { top_files: "fme_iris_mgp/tests/storage0_scale_cov_test.e";};
+    test storage0_histo               { top_files: "fme_iris_mgp/tests/storage0_histo_test.e"; count: 10;};
+    test storage0_min_frame           { top_files: "fme_iris_mgp/tests/storage0_min_frame_test.e"; };
+    test storage0_clk_throttling      { top_files: "fme_iris_mgp/tests/storage0_clk_throttling_test.e"; count: 30;};
+    test storage0_error               { top_files: "fme_iris_mgp/tests/storage0_error_test.e";  };
+    test storage0_error2              { top_files: "fme_iris_mgp/tests/storage0_error2_test.e"; count: 1; };
+    test storage0_weave               { top_files: "fme_iris_mgp/tests/storage0_weave_test.e";  };
+    test storage0_mipi                { top_files: "fme_iris_mgp/tests/storage0_mipi_test.e";  };
+    test storage0_copy                { top_files: "fme_iris_mgp/tests/storage0_copy_test.e";  };
+    test disp0_direct_capture_test    { top_files: "fme_iris_mgp/tests/disp0_direct_capture_test.e"; };
+    test disp1_direct_capture_test    { top_files: "fme_iris_mgp/tests/disp1_direct_capture_test.e"; };
+};
+
+group special {
+    #include "group_attributes.vsif"
+
+    count: 1;
+    timeout: 7200;
+
+    test iris_reset_storage0                        { top_files: "fme_iris_mgp/tests/iris_reset_storage0.e"; count: 2;};
+    test iris_reset_display0                        { top_files: "fme_iris_mgp/tests/iris_reset_display0.e"; };
+    test iris_reset_display0_mem                    { top_files: "fme_iris_mgp/tests/iris_reset_display0_mem.e"; };
+    test iris_reset_display0_mem_fetcheco           { top_files: "fme_iris_mgp/tests/iris_reset_display0_mem_fetcheco.e"; };
+    test iris_reset_display0_dump                   { top_files: "fme_iris_mgp/tests/iris_reset_display0_dump.e"; };
+    test iris_reset_display1                        { top_files: "fme_iris_mgp/tests/iris_reset_display1.e"; };
+    test iris_reset_display1_mem                    { top_files: "fme_iris_mgp/tests/iris_reset_display1_mem.e"; };
+    test iris_reset_display1_dump                   { top_files: "fme_iris_mgp/tests/iris_reset_display1_dump.e"; };
+    test iris_powerdown                             { top_files: "fme_iris_mgp/tests/iris_powerdown.e"; };
+    test gammacor_inactive_test                     { top_files: "fme_iris_mgp/tests/gammacor_inactive_test.e"; };
+    test mem_timeout                                { top_files: "fme_iris_mgp/tests/mem_timeout.e"; count: 0; }; // THDX: not valid anymore, if clocks are disabled we block the AHB bus indefinitely
+
+    test disp0_dynamic_max_width                    { top_files: "fme_iris_mgp/tests/disp0_dynamic_max_width_test.e"; };
+    test disp0_dynamic_max_width_scale              { top_files: "fme_iris_mgp/tests/disp0_dynamic_max_width_scale_test.e"; };
+    test disp0_dynamic_max_height                   { top_files: "fme_iris_mgp/tests/disp0_dynamic_max_height_test.e"; };
+    test disp1_dynamic_max_width                    { top_files: "fme_iris_mgp/tests/disp1_dynamic_max_width_test.e"; };
+    test disp1_dynamic_max_width_scale              { top_files: "fme_iris_mgp/tests/disp1_dynamic_max_width_scale_test.e"; };
+    test disp1_dynamic_max_height                   { top_files: "fme_iris_mgp/tests/disp1_dynamic_max_height_test.e"; };
+    test disp0_dynamic_capture_max_width            { top_files: "fme_iris_mgp/tests/disp0_dynamic_capture_max_width_test.e"; };
+    test disp0_dynamic_capture_max_height           { top_files: "fme_iris_mgp/tests/disp0_dynamic_capture_max_height_test.e"; count: 0; }; // !! needs debugging, timeout
+    test disp0_dynamic_capture_mipi_error           { top_files: "fme_iris_mgp/tests/disp0_dynamic_capture_mipi_error_test.e"; };
+    test storage0_max_width                         { top_files: "fme_iris_mgp/tests/storage0_max_width_test.e"; };
+    test storage0_max_height                        { top_files: "fme_iris_mgp/tests/storage0_max_height_test.e"; };
+    test storeag0_min_cap_freq                      { top_files: "fme_iris_mgp/tests/storage0_min_cap_freq.e"; }
+    test disp0_layerblend_secreplicateen            { top_files: "fme_iris_mgp/tests/disp0_layerblend_secreplicateen.e"; count: 10; };
+    test dual_disp_side_by_side                     { top_files: "fme_iris_mgp/tests/dual_disp_side_by_side.e"; count: 25; };
+    test disp0_static_perf                          { top_files: "fme_iris_mgp/tests/disp0_static_perf.e"; count: 15; };
+    test bug3325_pixelbus_randomize_unselected      { top_files: "fme_iris_mgp/tests/bug3325_pixelbus_randomize_unselected.e"; count: 20; };
+    test bug3325_pixelbus_randomize_unselected_auto { top_files: "fme_iris_mgp/tests/bug3325_pixelbus_randomize_unselected_auto.e"; count: 20; };
+};
+
+//group formal {
+//    count: 1;
+//    default_dispatch_parameters: "-q cy";
+//
+//    // Formal run doesn't scale with size of Iris MGP for AHB environment,
+//    // currently crashes. As mitigation mem_timeout.e test has been defined (see
+//    // special.mem_timeout)
+//
+//    //test ahb_interface {
+//    //    run_script: "irun_vm_single_run.sh";
+//    //    timeout: 15000;
+//    //    top_files: "$ENV(IRIS_VERIFICATION)/tb/ifv/ahb_interface/ahb_interface.f";
+//    //};
+//    //
+//    //test ahb_interface_lockup {
+//    //    run_script: "irun_vm_single_run.sh";
+//    //    timeout: 15000;
+//    //    top_files: "$ENV(IRIS_VERIFICATION)/tb/ifv/ahb_interface/ahb_interface_lockup.f";
+//    //};
+//
+//    test pixeng_synchronizer {
+//        run_script: "irun_vm_single_run.sh";
+//        timeout: 1000;
+//        top_files: "$ENV(IRIS_VERIFICATION)/tb/ifv/pixeng_synchronizer/pixeng_synchronizer.f";
+//    };
+//
+//    test connectivity {
+//        run_script: "irun_vm_single_run.sh";
+//        timeout: 12000;
+//        top_files: "$ENV(IRIS_VERIFICATION)/tb/ifv/general_purpose/general_purpose.f";
+//    };
+//};
+
