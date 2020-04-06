@@ -141,7 +141,7 @@ group special {
     test disp0_dynamic_capture_mipi_error           { top_files: "fme_iris_mgp/tests/disp0_dynamic_capture_mipi_error_test.e"; };
     test storage0_max_width                         { top_files: "fme_iris_mgp/tests/storage0_max_width_test.e"; };
     test storage0_max_height                        { top_files: "fme_iris_mgp/tests/storage0_max_height_test.e"; };
-    test storeag0_min_cap_freq                      { top_files: "fme_iris_mgp/tests/storage0_min_cap_freq.e"; }
+    test storeag0_min_cap_freq                      { top_files: "fme_iris_mgp/tests/storage0_min_cap_freq.e"; };
     test disp0_layerblend_secreplicateen            { top_files: "fme_iris_mgp/tests/disp0_layerblend_secreplicateen.e"; count: 10; };
     test dual_disp_side_by_side                     { top_files: "fme_iris_mgp/tests/dual_disp_side_by_side.e"; count: 25; };
     test disp0_static_perf                          { top_files: "fme_iris_mgp/tests/disp0_static_perf.e"; count: 15; };

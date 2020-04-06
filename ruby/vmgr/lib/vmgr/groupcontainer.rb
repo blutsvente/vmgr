@@ -4,39 +4,36 @@
 # Author: <thorsten.dworzak@verilab.com
 
 module Vmgr
-   #
-   # Struct representing group-container and its attributes; a group can contain
-   # tests or other groups
-   # Just add more to the struct constructor call if required.
-   #
+    #
+    # Class representing group-container and its attributes; a group can contain
+    # tests or other groups
+    class GroupContainer < Container
 
-    class GroupContainer< Struct.new(:name, :groups, :tests)
-
-      # Setter/getter for container attributes
-      def method_missing(name, *args, &block)
-         if name =~ /^(\w+)=$/ then
-            return self.instance_variable_set("@#{$1}", *args)
-         elsif name =~ /^(\w+)$/ then
-            return self.instance_variable_get("@#{$1}")
-         end
-         super
+      def initialize(name)
+          super(name, :group)
+          @hattribs = { "groups" => [],
+                      "tests" => []}
+          @@valid_list_attributes = ["groups", "tests"]
       end
 
+      # Add add_ and find_ methods for allowed list attributes
+      add_list_attribute_accessors("group")
+      add_list_attribute_accessors("test")
+
+      # Override the base-class method
       def write(handle, indent=0)
-        handle.puts "   " * indent + "group #{name} {"
-        self.instance_variables.each {|member|
-            case member
-            when :@name
-              next
-            when :@groups, :@tests
-               instance_variable_get(member).each { |it| it.write(handle, indent + 1) }
+          handle.puts @@INDENT * indent + "#{ctype.to_s} #{name} {"
+          @hattribs.each { |key, value|
+            # TODO: have class variable with list attributes
+            if @@valid_list_attributes.include?(key) then
+                @hattribs[key].each { |hcontainer|
+                  hcontainer.write(handle, indent + 1)
+                }
             else
-              if defined?(v = instance_variable_get(member)) then
-                handle.puts "   " * (indent + 1) + "#{member}".sub(/^@/, '') + ": #{v};"
-              end
+                handle.puts @@INDENT * (indent + 1) + "#{key}: #{value};"
             end
-        }
-        handle.puts "   " * indent + "};"
+          }
+          handle.puts @@INDENT * indent + "};"
       end
-   end
+    end
 end

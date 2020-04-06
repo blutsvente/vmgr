@@ -1,0 +1,25 @@
+// main.vsif
+session test_nesting {
+    session_description: <text>Test nesting</text>;
+    drm: "lsf";
+};
+
+group level_one {
+
+    test reg_irq    { top_files: "test.e";  count: 1; };
+    group level_two {
+        test foo { seed: 1; };
+
+        group level_three {
+            attrib: "nothing";
+        };
+
+        test bar { seed: 2; };
+    };
+
+    extend level_two {
+        count: 10;
+        extend bar { count: 1; };
+        extend foo { count: 2; };
+    };
+};
