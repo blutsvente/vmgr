@@ -2,52 +2,56 @@
 #
 # Creation Date: APR/2020
 # Author: <thorsten.dworzak@verilab.com
-
+# ---
+# Base class for vsif/vsof container
 module Vmgr
     #
-    # Class representing vsif/vsof containers
+    # Base class representing any type (:ctype) of vsif/vsof containers
     #
-    class Container < Struct.new(:name, :ctype)
+    class Container
 
-      include Enumerable
-
+      attr_accessor :name
+      attr_reader   :ctype
       attr_accessor :hattribs
       attr_reader   :INDENT
-      #attr_reader   :list_attributes
 
+      # Constructor
       def initialize(_name, _ctype)
           @@INDENT = "   "
           @hattribs = {}
-          #@@list_attributes = []
-          super(_name, _ctype)
-      end
-
-      def each
-          @hattribs.each { |it|
-            yield it
-          }
+          @name = _name
+          @ctype = _ctype
       end
 
       # Create accessor for getting attributes
       def method_missing(_name, *args, &block)
-          #if _name =~ /^(\w+)=$/ then
-          #  return @hattribs[$1] = args.size > 1 ? args: args[0]
-          #els
-          if _name =~ /^(\w+)$/ then
+          if _name =~ /^(\w+)=$/ then
+            return @hattribs[$1] = (args.size > 1 ? args: args[0])
+          elsif _name =~ /^(\w+)$/ then
             return @hattribs.has_key?($1) ? @hattribs[$1] : super
           end
           super
       end
 
-      # Accessor to add/override an attribute
+      # General accessor to add/override an attribute
       def add_attribute(key, value)
-          @hattribs["#{key}"] = value
+          @hattribs[key] = value
+      end
+
+      # Delete an attribute
+      def delete_attribute(key)
+          @hattribs.delete(key)
+      end
+
+      # Check whether attribute exists
+      def has_attribute(_name)
+          return @hattribs.has_key?(_name)
       end
 
       # Use macros to create accessor methods for list attributes
+      # of the form:
       # add_<name-of-list-attribute> (container)
       # find_<name-of-list-attribute>(name)
-      #
       def self.add_list_attribute_accessors(what)
           define_method("find_#{what}") do |_name|
             if @hattribs.has_key?("#{what}s")

@@ -1,8 +1,8 @@
 # Ruby Vmgr (Vmanager) library
 #
 # Creation Date: APR/2020
-# Author: <thorsten.dworzak@verilab.com
-
+# Author: <thorsten.dworzak@verilab.com>
+# ---
 module Vmgr
     #
     # Class representing a session container
@@ -16,7 +16,7 @@ module Vmgr
       add_list_attribute_accessors("group")
       add_list_attribute_accessors("run")
 
-      def initialize(_name, _description, _kind)
+      def initialize(_name, _description, _kind = "")
           super(_name, :session)
           @description = _description
           @hattribs = { "groups" => [],

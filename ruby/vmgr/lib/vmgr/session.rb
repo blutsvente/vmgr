@@ -2,7 +2,7 @@
 #
 # Creation Date: AUG/2019
 # Author: <thorsten.dworzak@verilab.com
-
+# ---
 module Vmgr
 
     #
@@ -11,10 +11,13 @@ module Vmgr
     #
     class Session < Struct.new(:description)
 
+      attr_accessor :session_container
+      attr_accessor :kind
+
       # Initialize
       def initialize(_description)
           super(_description)
-
+          @session_container = nil
           @@block_re            = Regexp.new(/(\w+)\s+([\w"]+)\s+\{/)
           @@vsof_entry_re       = Regexp.new(/(\w+)\s+:\s+(<text>\s*)*([^;<]+)(<\/text>)*\s*;/)
           # The vsif regexp requires preprocessing to remove leading whitespace
@@ -49,6 +52,7 @@ module Vmgr
           brace_open         = false;
 
           lines.concat(pre_process_vsif(filename));
+          return false if lines.empty?
 
           # Iterate over all lines and parse the {... } container entries
           lines.each { |line |
@@ -177,7 +181,7 @@ module Vmgr
             if value.strip.length != 0
                 container.add_attribute(key, value)
             end
-            str = match.post_match
+            str = match.post_match.strip
           end
           return match_found, str
       end
@@ -186,6 +190,7 @@ module Vmgr
           File.open(filename, "w") do |file|
             @session_container.write(file)
           end
+          puts "#{ME} [INFO]: wrote #{filename}"
       end
 
       # Slurp the .vsif and it's includes into an array containing each line
@@ -260,7 +265,7 @@ module Vmgr
                       if attrib == "sv_seed"
                         attrib = "seed"
                       end
-                      run_container.add_attribute(atrrib,  value)
+                      run_container.add_attribute(attrib,  value)
                   when "session_output"
                       # check if this is the correct file-type
                       if (attrib == "session_type" && value != "single_run")

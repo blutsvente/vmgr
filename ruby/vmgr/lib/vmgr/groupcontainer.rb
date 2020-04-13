@@ -1,8 +1,8 @@
 # Ruby Vmgr (Vmanager) library
 #
 # Creation Date: MAR/2020
-# Author: <thorsten.dworzak@verilab.com
-
+# Author: <thorsten.dworzak@verilab.com>
+# ---
 module Vmgr
     #
     # Class representing group-container and its attributes; a group can contain

@@ -35,35 +35,34 @@ Example:
 #
 module Vmgr
 
-   ME = File.basename(__FILE__, ".rb")
+    ME = File.basename(__FILE__, ".rb")
 
-   #
-   # Main part of module
-   #
+    #
+    # Main part of module
+    #
 
-   # Parse options
-   vsif_file = ""
-   opts = GetoptLong.new( [ '--help', '-h', GetoptLong::NO_ARGUMENT ]
-                         )
-   opts.each { | opt, arg |
+    # Parse options
+    vsif_file = ""
+    opts = GetoptLong.new( [ '--help', '-h', GetoptLong::NO_ARGUMENT ]
+                        )
+    opts.each { | opt, arg |
       case opt
       when '--help'
-         puts $USAGE
-         exit 0
+          puts $USAGE
+          exit 0
       end
-   }
+    }
 
-   if ARGV.size != 1 then
+    if ARGV.size != 1 then
       puts "#{ME} [ERROR]: must supply one vsif file as input"
       puts $USAGE
       exit 1
-   else
-       vsif_file = ARGV[0];
-   end
+    else
+      vsif_file = ARGV[0];
+    end
 
-   session = Session.new();
-   session.read_vsif(vsif_file);
-
+    session = Session.new("Re-run session");
+    session.read_vsif(vsif_file);
 
 
 end

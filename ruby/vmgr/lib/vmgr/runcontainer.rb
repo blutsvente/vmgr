@@ -2,7 +2,7 @@
 #
 # Creation Date: AUG/2019
 # Author: <thorsten.dworzak@verilab.com
-
+# ---
 module Vmgr
     #
     # Class representing the run-container of .vsof files

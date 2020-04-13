@@ -2,9 +2,11 @@
 session test_nesting {
     session_description: <text>Test nesting</text>;
     drm: "lsf";
+    seed: random;
 };
 
 group level_one {
+    count: 100;
 
     test reg_irq    { top_files: "test.e";  count: 1; };
     group level_two {
@@ -12,6 +14,7 @@ group level_one {
 
         group level_three {
             attrib: "nothing";
+            test nil { count: 0; };
         };
 
         test bar { seed: 2; };
@@ -19,7 +22,7 @@ group level_one {
 
     extend level_two {
         count: 10;
-        extend bar { count: 1; };
-        extend foo { count: 2; };
+        extend bar { count: 1; sanity_seed: random;};
+        extend foo { count: 2; sanity_count: 99;};
     };
 };
