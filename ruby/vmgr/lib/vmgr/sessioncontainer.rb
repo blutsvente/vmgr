@@ -40,10 +40,17 @@ module Vmgr
           }
           handle.puts INDENT * indent + "};"
 
-          # write the groups
-          @hattribs["groups"].each {|it|
-            it.write(handle, indent)
-          }
+          if kind == :vsif then
+            # write the groups
+            @hattribs["groups"].each {|it|
+                it.write(handle, indent)
+            }
+          elsif kind == :vsof then
+            # write run-containers
+            @hattribs["runs"].each {|it|
+                it.write(handle, indent)
+            }
+          end
       end
 
       # Write content in vms_run testlist format to file handle
