@@ -1,9 +1,10 @@
 #!/usr/bin/ruby
 #
-# Wrapper to enter Inway/Camino project
+# Wrapper to enter shell in Inway/Camino/ICManage project
 #
 # Todo:
-# - init projects list from file .inway_projects in home
+# - init projects list from file .xg_setup in home
+#
 
 require 'getoptlong'
 
@@ -11,62 +12,81 @@ module Xg
 
    # Module variable
    @debug = false
+   @ME = $0
 
-   # Container class for project attributes, derived from Struct
-   class InwayPrj < Struct.new(:nicknames, :iversion, :iprj, :isubprj, :iunit)
+   # Container classes for project attributes, derived from Struct
+   class Prj < Struct.new(:nicknames, :iversion, :iprj, :isubprj, :iunit)
    end
 
    # ------------------------------------------------------------------------------------------
    # Init list of projects (as module constant):
-   #              [nicknames]          Inway-version   project     sub-project          default-unit
+   #              [nicknames]     Project-tool/version   project     sub-project        default-unit/dir
    PROJECTS = [
-      InwayPrj.new(["core", "ig32"],    99,            "ig32",     "core",            "ig32_cpu" ),
-      InwayPrj.new(["cc40"],           99,             "cc40",     "m5270",           ""            ),
-      InwayPrj.new(["7upd", "debug"],  99,             "sevenup",  "debug",           ""            )
+       Prj.new(["phase2", "6m"], :icmanage,          "mxvideoss",      "dev6m_5",     "vvideoio"),
+       Prj.new(["ver1", "4m"],   :icmanage,          "mxvideoss",      "dev4m_2",     "vvideoio"),
+       Prj.new(["ver2"],         :icmanage,          "mxvideoss_ver2", "dev_4",       "vvideoio")
+
+      #,Prj.new(["core", "ig32"],    :v99,          "ig32",     "core",            "ig32_cpu")
+      #,Prj.new(["cc40"],            :v99,          "cc40",     "m5270",           ""        )
+      #,Prj.new(["7upd", "debug"],   :v99,          "sevenup",  "debug",           ""        )
    ]
 
    # ------------------------------------------------------------------------------------------
    # Definitions
    #
    def Xg.print_projects
-      temp = PROJECTS.collect { |prj| prj.nicknames.join("/")}
+      temp = PROJECTS.collect { |prj| prj.nicknames.join(" or ")}
       return "[\n    " + temp.join("\n    ") + "\n]"
    end
 
    usage = "Wrapper to enter Inway project.
-Usage: #{$0} [-h] or [-d] <project> [<view>]
-with -h   print usage and exit
-     -d   print command and exit
-<project> one of #{print_projects}
-<view>    give an optional view-name for the project (default: default)
+Usage: #{ME} [-h] or [-d] <project> [<view/sub-dir>]
+with -h           print usage and exit
+     -d           print command and exit
+<project>         nickname of project, available are\n#{print_projects}
+<view/sub-dir>    give an optional view/subdirectory-name to enter
 "
 
-   # Extend InwayPrj class
-   class InwayPrj
-      # Method to get my Inway wrapper script depending on the Inway version
-      def get_inway_wrapper
+   # Extend Prj class
+   class Prj
+      # Method to get my Inway wrapper script depending on the procect-tool version
+      def get_wrapper
          case iversion
-         when 4
+         when :v4
             return "inway4_linux.sh"
-         when 5, 6
+         when :v5, :v6
             return "inway6_linux.sh"
+         when :icmanage
+            return "#{ENV['PROJMENUROOT']}/proj.menu.rb"
          else
             return "camino"
          end
       end
    end
 
-   # Assemble command-string to launch the Inway shell
+   # Assemble command-string to launch the shell in the project
    def Xg.get_command_str(prj, view = "default")
       unit = ""
       if not prj.iunit.empty?
          unit = "-unit #{prj.iunit}"
       end
-
-      if prj.iversion == 4
-         command_str = [prj.get_inway_wrapper, prj.iprj, prj.isubprj, view, "-quiet -keepcs", unit, ARGV].join(" ");
+      if view == "default"
+         subdir = prj.iunit
       else
-         command_str = [prj.get_inway_wrapper, prj.iprj, prj.isubprj, view, "-quiet -workarea keep", unit, ARGV].join(" ");
+         subdir = view
+      end
+
+      case prj.iversion
+      when :v4
+         command_str  = [prj.get_wrapper, prj.iprj, prj.isubprj, view, "-quiet -keepcs", unit, ARGV].join(" ");
+      when :icmanage
+         workspace    = [ENV['USER'], prj.iprj, prj.isubprj].join("_")
+         dir          = ["/proj/gpfs/#{ENV['USER']}/workspaces", workspace, subdir].join("/")
+         terminal_cmd = "/bin/sh -c 'export WORKSPACE=#{workspace}; cd #{dir}; exec tcsh'"
+         command_str  = prj.get_wrapper + " -projset #{prj.iprj}; " + prj.get_wrapper +
+                       " -projsetwa #{prj.isubprj}; gnome-terminal --profile=My -- #{terminal_cmd}"
+      else
+         command_str  = [prj.get_wrapper, prj.iprj, prj.isubprj, view, "-quiet -workarea keep", unit, ARGV].join(" ");
       end
       return command_str
    end
@@ -81,13 +101,13 @@ with -h   print usage and exit
                if not found
                   found = true; result = prj
                else
-                  puts "ERROR: given project name #{name.inspect} matches more than one project"
+                  STDERR.puts "#{ME} ERROR: given project name #{name.inspect} matches more than one project"
                end
             end
          end
       end
       if not found
-         puts "ERROR: given project name #{name.inspect} does not match known projects, one of #{print_projects}"
+         STDERR.puts "#{ME} ERROR: given project name #{name.inspect} does not match known projects, one of #{print_projects}"
       end
       return result
    end
@@ -115,11 +135,8 @@ with -h   print usage and exit
       # Remaining arguments
       name = ARGV.shift
       view = "default"
-      if ARGV.length > 0
-         view = ARGV.shift
-      end
+      view = ARGV.shift if ARGV.length > 0
 
-      # Make it so
       matching_project = get_project(name)
       if matching_project != nil
          command_str = get_command_str(matching_project, view)

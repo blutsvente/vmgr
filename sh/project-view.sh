@@ -1,9 +1,12 @@
 #!/bin/sh
-# Helper script to create a meaningful prompt for ClearCase vobs.
+# Helper script to create a meaningful prompt for projects/ClearCase vobs.
 # Returns a string of the format <subprojectname> or <subprojectname>.<workspaceid> if <workspaceid> is != "default"
 #
 result=
-if [ -n "$WORKAREA" ]; then
+if [ -n "$PROJ" ]; then
+    result=`$PROJMENUROOT/proj.menu.rb -hdr  | \grep Dir: | sed -e "s/^\s//; s/\s\s*/ /g" | cut -d " " -f 2`
+    result=`basename $result`
+elif [ -n "$WORKAREA" ]; then
     result="${SUBPROJECTNAME}"
     if [ -n "$WORKSPACEID" ]; then
        # note: the pwv command is more reliable than the WORKSPACEID variable
@@ -24,4 +27,4 @@ if [ -n "$WORKAREA" ]; then
 fi
 
 echo $result
-
+# end
