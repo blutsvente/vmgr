@@ -25,7 +25,7 @@ dir_patterns = [
 
 # project dependent
 ies_patterns = [
-   "*.ucm", "*.log", "*.out", ".DEFAULT", "*.vsof", "ncsim_*.err", "*.dsn", "*.trn", "*.elog"
+   "*.log", "*.out", ".DEFAULT", "ncsim_*.err", "*.dsn", "*.trn", "*.elog"
 ]
 questa_patterns = [
    "*.tl", "*.log", "*.out", "*.err", "*.acc", "*.ocf", "*.com", "*.dbg" "*.wlf","*.ucm", "*.ucd", "*.ucdb", "transcript",

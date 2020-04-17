@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 #
 # Wrapper to enter shell in Inway/Camino/ICManage project
 #
@@ -11,8 +11,9 @@ require 'getoptlong'
 module Xg
 
    # Module variable
-   @debug = false
-   @ME = $0
+   @debug        = false
+   @ME           = $0
+   @terminal_exe = "gnome-terminal --profile = My"
 
    # Container classes for project attributes, derived from Struct
    class Prj < Struct.new(:nicknames, :iversion, :iprj, :isubprj, :iunit)
@@ -40,7 +41,7 @@ module Xg
    end
 
    usage = "Wrapper to enter Inway project.
-Usage: #{ME} [-h] or [-d] <project> [<view/sub-dir>]
+Usage: #{@ME} [-h] or [-d] <project> [<view/sub-dir>]
 with -h           print usage and exit
      -d           print command and exit
 <project>         nickname of project, available are\n#{print_projects}
@@ -83,8 +84,8 @@ with -h           print usage and exit
          workspace    = [ENV['USER'], prj.iprj, prj.isubprj].join("_")
          dir          = ["/proj/gpfs/#{ENV['USER']}/workspaces", workspace, subdir].join("/")
          terminal_cmd = "/bin/sh -c 'export WORKSPACE=#{workspace}; cd #{dir}; exec tcsh'"
-         command_str  = prj.get_wrapper + " -projset #{prj.iprj}; " + prj.get_wrapper +
-                       " -projsetwa #{prj.isubprj}; gnome-terminal --profile=My -- #{terminal_cmd}"
+         command_str  = prj.get_wrapper + " -projset #{prj.iprj};" +
+            prj.get_wrapper + " -projsetwa #{prj.isubprj};" + " #{@terminal_exe} -- #{terminal_cmd}"
       else
          command_str  = [prj.get_wrapper, prj.iprj, prj.isubprj, view, "-quiet -workarea keep", unit, ARGV].join(" ");
       end
@@ -101,13 +102,13 @@ with -h           print usage and exit
                if not found
                   found = true; result = prj
                else
-                  STDERR.puts "#{ME} ERROR: given project name #{name.inspect} matches more than one project"
+                  STDERR.puts "#{@ME} ERROR: given project name #{name.inspect} matches more than one project"
                end
             end
          end
       end
       if not found
-         STDERR.puts "#{ME} ERROR: given project name #{name.inspect} does not match known projects, one of #{print_projects}"
+         STDERR.puts "#{@ME} ERROR: given project name #{name.inspect} does not match known projects, one of #{print_projects}"
       end
       return result
    end
@@ -115,7 +116,7 @@ with -h           print usage and exit
    # ------------------------------------------------------------------------------------------
    # Main script
    #
-   if __FILE__ == $0 # prevent execution if imported by another module
+   if __FILE__ == @ME # prevent execution if imported by another module
 
       # Parse Options
       opts = GetoptLong.new(
