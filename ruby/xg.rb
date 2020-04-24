@@ -84,7 +84,7 @@ with -h           print usage and exit
          workspace    = [ENV['USER'], prj.iprj, prj.isubprj].join("_")
          dir          = ["/proj/gpfs/#{ENV['USER']}/workspaces", workspace, subdir].join("/")
          terminal_cmd = "/bin/sh -c 'export WORKSPACE=#{workspace}; cd #{dir}; exec tcsh'"
-         command_str  = prj.get_wrapper + " -projset #{prj.iprj};" +
+         command_str  = prj.get_wrapper + " -projset #{prj.iprj} > /dev/null 2>&1;" +
             prj.get_wrapper + " -projsetwa #{prj.isubprj};" + " #{@terminal_exe} -- #{terminal_cmd}"
       else
          command_str  = [prj.get_wrapper, prj.iprj, prj.isubprj, view, "-quiet -workarea keep", unit, ARGV].join(" ");
