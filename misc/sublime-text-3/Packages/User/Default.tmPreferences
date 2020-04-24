@@ -38,13 +38,19 @@
                 <key>name</key>
                 <string>TM_PROJECT_NAME</string>
                 <key>value</key>
+                <string><![CDATA[mxvideoss]]></string>
+            </dict>
+            <dict>
+                <key>name</key>
+                <string>TM_SN_PACKAGE</string>
+                <key>value</key>
                 <string><![CDATA[fme_iris_env]]></string>
             </dict>
             <dict>
                 <key>name</key>
                 <string>TM_YEAR</string>
                 <key>value</key>
-                <string><![CDATA[2019]]></string>
+                <string><![CDATA[2020]]></string>
             </dict>
         </array>
     </dict>

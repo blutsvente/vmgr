@@ -13,7 +13,7 @@ Description       : ${1:<add a description>}
 --------------------------------------------------------------------------------
 
 <'
-package $TM_PROJECT_NAME;
+package $TM_SN_PACKAGE;
 
 -- sit straight !
 
