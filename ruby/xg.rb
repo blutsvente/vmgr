@@ -13,7 +13,7 @@ module Xg
    # Module variable
    @debug        = false
    @ME           = $0
-   @terminal_exe = "gnome-terminal --profile = My"
+   @terminal_exe = "gnome-terminal --profile=My"
 
    # Container classes for project attributes, derived from Struct
    class Prj < Struct.new(:nicknames, :iversion, :iprj, :isubprj, :iunit)
@@ -21,11 +21,13 @@ module Xg
 
    # ------------------------------------------------------------------------------------------
    # Init list of projects (as module constant):
-   #              [nicknames]     Project-tool/version   project     sub-project        default-unit/dir
+   #              [nicknames]          Project-tool/version   project        sub-project     default-unit/dir
    PROJECTS = [
-       Prj.new(["phase2", "6m"], :icmanage,          "mxvideoss",      "dev6m_5",     "vvideoio"),
-       Prj.new(["ver1", "4m"],   :icmanage,          "mxvideoss",      "dev4m_2",     "vvideoio"),
-       Prj.new(["ver2"],         :icmanage,          "mxvideoss_ver2", "dev_4",       "vvideoio")
+       Prj.new(["phase2sv", "p2sv"],         :icmanage,       "mxvideoss",       "dev6m_7",     "vmxvideoss" ),
+       Prj.new(["phase2e", "p2e", "phase2"], :icmanage,       "mxvideoss",       "dev6m_5",     "vvideoio"   ),
+       Prj.new(["ver1", "4m"],               :icmanage,       "mxvideoss",       "dev4m_2",     "vvideoio"   ),
+       Prj.new(["ver2"],                     :icmanage,       "mxvideoss_ver2",  "dev_4",       "vvideoio"   ),
+       Prj.new(["ddr"],                      :icmanage,       "mxvideossddr",    "dev_6",       ""           )
 
       #,Prj.new(["core", "ig32"],    :v99,          "ig32",     "core",            "ig32_cpu")
       #,Prj.new(["cc40"],            :v99,          "cc40",     "m5270",           ""        )
@@ -40,7 +42,7 @@ module Xg
       return "[\n    " + temp.join("\n    ") + "\n]"
    end
 
-   usage = "Wrapper to enter Inway project.
+   usage = "Wrapper to enter IcManage/Inway project.
 Usage: #{@ME} [-h] or [-d] <project> [<view/sub-dir>]
 with -h           print usage and exit
      -d           print command and exit
