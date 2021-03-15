@@ -23,6 +23,6 @@ group level_one {
     extend level_two {
         count: 10;
         extend bar { count: 1; sanity_seed: random;};
-        extend foo { count: 2; sanity_count: 99;};
+        extend foo { count: 2; sanity_count: 99x;};
     };
 };
