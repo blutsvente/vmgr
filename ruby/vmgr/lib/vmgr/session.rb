@@ -1,7 +1,7 @@
 # Ruby Vmgr (Vmanager) library
 #
 # Creation Date: AUG/2019
-# Author: <thorsten.dworzak@verilab.com
+# Author: <thorsten.dworzak@verilab.com>
 # ---
 module Vmgr
 
@@ -17,7 +17,7 @@ module Vmgr
       # Initialize
       def initialize(_description)
           super(_description)
-          @session_container = nil
+          @session_container    = nil
           @@block_re            = Regexp.new(/(\w+)\s+([\w"]+)\s+\{/)
           @@vsof_entry_re       = Regexp.new(/(\w+)\s+:\s+(<text>\s*)*([^;<]+)(<\/text>)*\s*;/)
           # The vsif regexp requires preprocessing to remove leading whitespace
@@ -55,6 +55,8 @@ module Vmgr
           return false if lines.empty?
 
           # Iterate over all lines and parse the {... } container entries
+          # TODO: cannot parse attributes following a container.
+          # TODO: does not detect error when trailing ; is missing in attribute
           lines.each { |line |
             line.chomp
             begin
@@ -62,7 +64,7 @@ module Vmgr
                 match = @@vsif_container_re.match(line);
                 if match then
                   match_found = true
-                  # parse .vsif for container and push respective context to stack
+                  # Parse .vsif for container and push respective context to stack
                   container_type, container_name = match[1..2];
                   add_to_context_stack(container_type, container_name)
                   line = match.post_match.strip
@@ -85,14 +87,23 @@ module Vmgr
 
                 if line =~ /\}\s*(;)?\s*/ then
                 	if $1 != ";" then
-                		STDERR.puts "#{ME} [ERROR]: parse error, closing brace without semicolon (#{line})"
+                		STDERR.puts "#{ME} [ERROR]: read_vsif(): parse error, closing brace without semicolon (#{line.red})"
                 		return false
                 	end
-                  # pop context and add container object to enclosing container
+
+                  # Pop context and add container object to enclosing container
                   match_found = true
-                  brace_open  = false
+                  # brace_open  = false
                   return false if !link_parsed_container()
                   line = $'.strip
+                end
+
+                if !match_found && line.length()>0
+                  if /^\s*\/\//.match(line)
+                    line = ""
+                  else
+                    puts "#{ME} [WARNING]: read_vsif(): suspicious trailing string found or missing semicolon (#{line.red})"
+                  end
                 end
             end while line.length > 0 && match_found
           }
@@ -186,11 +197,20 @@ module Vmgr
           return match_found, str
       end
 
+      # Write the content to file handle
       def write_vsif(filename)
           File.open(filename, "w") do |file|
             @session_container.write(file)
           end
           puts "#{ME} [INFO]: wrote #{filename}"
+      end
+
+      # Write the content to file handle in vms_run testlist format
+      def write_tl(filename)
+        File.open(filename, "w") do |file|
+          @session_container.write_tl(file)
+        end
+        puts "#{ME} [INFO]: wrote #{filename}"
       end
 
       # Slurp the .vsif and it's includes into an array containing each line
@@ -278,5 +298,6 @@ module Vmgr
           }
           return run_container
       end
+
     end
 end

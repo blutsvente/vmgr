@@ -12,8 +12,8 @@ module Vmgr
       def initialize(name)
           super(name, :group)
           @hattribs = { "groups" => [],
-                      "tests" => []}
-          @@valid_list_attributes = ["groups", "tests"]
+                        "tests" => [] }
+          @valid_list_attributes.push("groups", "tests")
       end
 
       # Add add_ and find_ methods for allowed list attributes
@@ -22,18 +22,17 @@ module Vmgr
 
       # Override the base-class method
       def write(handle, indent=0)
-          handle.puts @@INDENT * indent + "#{ctype.to_s} #{name} {"
+          handle.puts INDENT * indent + "#{ctype.to_s} #{name} {"
           @hattribs.each { |key, value|
-            # TODO: have class variable with list attributes
-            if @@valid_list_attributes.include?(key) then
+            if @valid_list_attributes.include?(key) then
                 @hattribs[key].each { |hcontainer|
                   hcontainer.write(handle, indent + 1)
                 }
             else
-                handle.puts @@INDENT * (indent + 1) + "#{key}: #{value};"
+                handle.puts INDENT * (indent + 1) + "#{key}: #{value};"
             end
           }
-          handle.puts @@INDENT * indent + "};"
+          handle.puts INDENT * indent + "};"
       end
     end
 end

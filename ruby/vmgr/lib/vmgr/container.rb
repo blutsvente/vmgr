@@ -1,7 +1,7 @@
 # Ruby Vmgr (Vmanager) library
 #
 # Creation Date: APR/2020
-# Author: <thorsten.dworzak@verilab.com
+# Author: <thorsten.dworzak@verilab.com>
 # ---
 # Base class for vsif/vsof container
 module Vmgr
@@ -14,13 +14,18 @@ module Vmgr
       attr_reader   :ctype
       attr_accessor :hattribs
       attr_reader   :INDENT
+      attr_accessor :parent
+      attr_accessor :valid_list_attributes
+
+      INDENT = "   "
 
       # Constructor
       def initialize(_name, _ctype)
-          @@INDENT = "   "
           @hattribs = {}
           @name = _name
           @ctype = _ctype
+          @parent = nil
+          @valid_list_attributes = []
       end
 
       # Create accessor for getting attributes
@@ -48,6 +53,15 @@ module Vmgr
           return @hattribs.has_key?(_name)
       end
 
+      # Get a value by the attribute name
+      def get_value(_name)
+        if has_attribute(_name)
+          return @hattribs[_name]
+        else
+          return nil
+        end
+      end
+
       # Use macros to create accessor methods for list attributes
       # of the form:
       # add_<name-of-list-attribute> (container)
@@ -63,6 +77,7 @@ module Vmgr
 
           define_method("add_#{what}") do |val|
             if not self.send("find_#{what}", val.name) then
+                val.parent = self
                 @hattribs["#{what}s"].push(val)
             end
           end
@@ -70,11 +85,11 @@ module Vmgr
 
       # Write (scalar) attributes to handle
       def write(handle, indent=0)
-          handle.puts @@INDENT * indent + "#{ctype.to_s} #{name} {"
+          handle.puts INDENT * indent + "#{ctype.to_s} #{name} {"
           @hattribs.each { |key, value|
-            handle.puts @@INDENT * (indent + 1) + "#{key}: #{value};"
+            handle.puts INDENT * (indent + 1) + "#{key}: #{value};"
           }
-          handle.puts @@INDENT * indent + "};"
+          handle.puts INDENT * indent + "};"
       end
     end
 end
