@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 # $Id:$
 #
 # Diff a working copy of a subversion-managed file to its previous revision
@@ -10,12 +10,17 @@
 # Author: Thorsten Dworzak <thorsten.dworzak@verilab.com>
 #
 
+# Site-specific setup
+temp=${TMPDIR:-/tmp}/$this/$$
+native_diff="diff --ignore-all-space --ignore-blank-lines"
+lsf_cmd="bsub -Ip -q interactive -R 'select[os==centos6]' dbus-launch"
+
+# Defaults values for variables
 tool="meld"
 this=`basename $0`
-temp=${TMPDIR:-/tmp}/$this/$$
 revision=PREV
 opts="$@"
-native_diff="diff --ignore-all-space --ignore-blank-lines"
+use_lsf=0
 
 usage() {
   echo "usage  : $this [-t <tool>] [-r <revision>] <file>"
@@ -50,8 +55,8 @@ fi
 
 if [ -n "$tool_select" ]; then
     case "$tool_select" in
-        m) tool="meld";;
-        k) tool="kompare";;
+        m) tool="meld"; use_lsf=1;;
+        k) tool="kompare"; use_lsf=1;;
         n) tool=$native_diff;;
         *) echo $this: "ERROR: unsupported tool spec: $tool_select"; printf '%s\n' "$(usage)"; exit 1;;
     esac
@@ -93,7 +98,11 @@ svn cat -r $revision $file >| $outfile
 
 if [ $? -eq 0 ]; then
     echo comparing $current_str with $revision revision in file $outfile...
-    $tool $file $outfile
+    if [ $use_lsf -eq 1 ]; then
+      $lsf_cmd $tool $file $outfile
+    else
+      $tool $file $outfile
+    fi
     \rm -f $outfile
 else
     echo $this: ERROR from command \"$tool\", aborting.
