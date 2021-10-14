@@ -25,13 +25,15 @@ module Xg
    # Init list of projects (as module constant):
    #              [nicknames]          Project-tool/version   project      sub-project     default-unit/ddc    comment
    PROJECTS = [
-       Prj.new(["phase2sv", "p2sv"],   :icmanage,       "mxvideoss",       "dev6m_8",     "vmxvideoss"                                           ) ,
-       Prj.new(["phase2e", "p2e"],     :icmanage,       "mxvideoss",       "dev6m_5",     "vvideoio"                                             ) ,
-       Prj.new(["ver1", "4m"],         :icmanage,       "mxvideoss",       "dev4m_2",     "vvideoio"                                             ) ,
-       Prj.new(["ddre"],               :icmanage,       "mxvideoss_ddr",   "dev_10",      "vmxvideoss_ddr"  , "old ws with Specman/e repo checkouts" ) ,
-       Prj.new(["ddr"],                :icmanage,       "mxvideoss_ddr",   "dev_13",      "vmxvideoss_ddr"  , "main ws for vmxvideoss_ddr"           ) ,
-       Prj.new(["ddrd"],               :icmanage,       "mxvideoss_ddr",   "dev_12",      "mxvideoss_ddr"   , "design-only ws (dev_all config)"      ) ,
-       Prj.new(["ddricm"],             :icmanage,       "mxvideoss_ddr",   "dev_16",      "vmxvideoss_ddr"  , "for ICM release/vaulting"             )
+       Prj.new(["phase2", "p2"],   :icmanage,       "mxvideoss",           "dev6m_8",     "vmxvideoss"                                           ) ,
+       # Prj.new(["phase2e", "p2e"],     :icmanage,       "mxvideoss",       "dev6m_5",     "vvideoio"                                             ) ,
+       Prj.new(["ver1", "4m"],     :icmanage,       "mxvideoss",           "dev4m_2",     "vvideoio"                                             ) ,
+       Prj.new(["ddre"],           :icmanage,       "mxvideoss_ddr",       "dev_10",      "vmxvideoss_ddr"  , "old ws with Specman/e repo checkouts" ) ,
+       Prj.new(["ddr"],            :icmanage,       "mxvideoss_ddr",       "dev_13",      "vmxvideoss_ddr"  , "main ws for vmxvideoss_ddr"           ) ,
+       Prj.new(["ddrd"],           :icmanage,       "mxvideoss_ddr",       "dev_12",      "mxvideoss_ddr"   , "design-only ws (dev_all config)"      ) ,
+       Prj.new(["ddricm"],         :icmanage,       "mxvideoss_ddr",       "dev_16",      "vmxvideoss_ddr"  , "for ICM release/vaulting"             ) ,
+       Prj.new(["iop"],            :icmanage,       "mxvideoss_ddr",       "dev_17",      "vmxvideoss_ddr"  , "for IOP testbench"                ),
+       Prj.new(["gfx"],            :icmanage,       "mxs22gfxss",          "1.0-dev_18",  "vmxs22gfxss"     , "main ws for vmxs22gfxss"          )
    ]
 
    # ------------------------------------------------------------------------------------------
@@ -97,11 +99,14 @@ with -h           print usage and exit
          workspace    = [ENV['USER'], prj.iprj, prj.isubprj].join("_")
          dir          = ["/proj/gpfs/#{ENV['USER']}/workspaces", workspace, subdir].join("/")
          terminal_cmd = "/bin/sh -c 'export WORKSPACE=#{workspace}; cd #{dir}; exec tcsh'"
+         # remove version from variant, the workspace naming is not consistent; if e.g. variant 1.0-dev
+         # then the workspace name is dev_<id>
+         wa_id        = prj.isubprj.sub(/^.*(dev_.+$)/, '\1')
 
          # 1. set the project in the current shell 2. set the workspace 3. launch a new terminal
          # note: if the workspace is new, user must first call projupdate; this is currently not handled by the script
          command_str  = prj.get_wrapper + " -projset #{prj.iprj} > /dev/null 2>&1;" \
-                      + prj.get_wrapper + " -projsetwa #{prj.isubprj};" + " #{@terminal_exe} --title #{workspace} -- #{terminal_cmd}"
+                      + prj.get_wrapper + " -projsetwa #{wa_id};" + " #{@terminal_exe} --title #{workspace} -- #{terminal_cmd}"
       else
          command_str  = [prj.get_wrapper, prj.iprj, prj.isubprj, view, "-quiet -workarea keep", unit, ARGV].join(" ");
       end

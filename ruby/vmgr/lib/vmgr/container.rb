@@ -64,8 +64,9 @@ module Vmgr
 
       # Use macros to create accessor methods for list attributes
       # of the form:
-      # add_<name-of-list-attribute> (container)
-      # find_<name-of-list-attribute>(name)
+      # add_<name-of-list-attribute>       (container)
+      # find_<name-of-list-attribute>      (name)
+      # find_<name-of-list-attribute>_index(name)
       def self.add_list_attribute_accessors(what)
           define_method("find_#{what}") do |_name|
             if @hattribs.has_key?("#{what}s")
@@ -75,12 +76,31 @@ module Vmgr
             return nil
           end
 
-          define_method("add_#{what}") do |val|
-            if not self.send("find_#{what}", val.name) then
-                val.parent = self
-                @hattribs["#{what}s"].push(val)
+          define_method("find_#{what}_index") do |_name|
+            if @hattribs.has_key?("#{what}s")
+                idx = @hattribs["#{what}s"].rindex{|item| item.name == _name}
+                return idx
             end
+            return nil
           end
+
+          define_method("add_#{what}") do |val|
+            #if not self.send("find_#{what}", val.name) then
+            val.parent = self
+            @hattribs["#{what}s"].push(val)
+            #end
+          end
+
+          define_method("remove_#{what}") do |_name|
+            if @hattribs.has_key?("#{what}s")
+              idx = @hattribs["#{what}s"].rindex{|item| item.name == _name}
+              if idx != nil
+                return @hattribs["#{what}s"].delete_at(idx)
+              end
+            end
+            return nil
+          end
+
       end
 
       # Write (scalar) attributes to handle

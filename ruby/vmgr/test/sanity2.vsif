@@ -1,0 +1,11 @@
+session sanity {
+   session_description: <text>Regression to check no mode is broken</text>;
+   sv_seed: 1;
+   count: 1;
+};
+
+group tests {
+  test mxs22gfxss_sanity_test { sim_mode: DC;         };
+  test mxs22gfxss_sanity_test { sim_mode: GGPU;       };
+  test mxs22gfxss_sanity_test { sim_mode: MXS22GFXSS; };
+};

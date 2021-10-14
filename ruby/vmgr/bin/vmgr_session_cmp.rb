@@ -1,8 +1,11 @@
 #!/usr/bin/ruby
 #
-# Compares the .vsof files of two vManager sessions
-# Author: Thorsten Dworzak <thorsten.dworzak@verilab.com>
+# Ruby Vmgr (Vmanager) library
 #
+# Compares the .vsof files of two vManager sessions
+# ---
+# Author: Thorsten Dworzak <thorsten.dworzak@verilab.com>
+# ---
 
 require 'getoptlong'
 require 'find'

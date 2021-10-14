@@ -1,9 +1,12 @@
 #!/usr/bin/ruby
 #
+# Ruby Vmgr (Vmanager) library
+#
 # Reads a .vsif file (usually exported from the re-run dialog of a session)
 # and removes all attributes not required to re-run it.
+# ---
 # Author: Thorsten Dworzak <thorsten.dworzak@verilab.com>
-#
+# ---
 
 require 'getoptlong'
 require 'find'

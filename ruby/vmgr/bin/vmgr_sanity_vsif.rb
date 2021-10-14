@@ -1,10 +1,13 @@
 #!/tools/apps/ruby/bin/ruby.2.1.5 -w
 #
+# Ruby Vmgr (Vmanager) library
+#
 # Reads a .vsif file and creates a reduced sanity .vsif file.
 # See USAGE.
 # ---
 # Author: Thorsten Dworzak <thorsten.dworzak@verilab.com>
 # ---
+#
 require 'getoptlong'
 require 'find'
 require_relative '../lib/vmgr/collaterals.rb'

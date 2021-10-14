@@ -55,17 +55,16 @@ module Vmgr
           return false if lines.empty?
 
           # Iterate over all lines and parse the {... } container entries
-          # TODO: cannot parse attributes following a container.
-          # TODO: does not detect error when trailing ; is missing in attribute
+          # TODO: does not create container object with no attributes (e.g. no {...};)
           lines.each { |line |
             line.chomp
             begin
                 match_found = false
-                match = @@vsif_container_re.match(line);
+                match = @@vsif_container_re.match(line)
                 if match then
                   match_found = true
                   # Parse .vsif for container and push respective context to stack
-                  container_type, container_name = match[1..2];
+                  container_type, container_name = match[1..2]
                   add_to_context_stack(container_type, container_name)
                   line = match.post_match.strip
                   brace_open = false;
@@ -123,21 +122,47 @@ module Vmgr
           when "test"
             @context.push(TestContainer.new(container_name))
           when "extend"
-            if @context.size > 0 then
-                existing = @context[-1].find_group(container_name)
+            if @context.size == 0 then
+              if !@session_container then
+                STDERR.puts "#{ME} [ERROR]: extension of '#{container_name}' before container definition (currently unsupported)"
+                return false
+              end
+              # search extended container in groups
+              existing = @session_container.find_group(container_name)
+              if !existing then
+                STDERR.puts "#{ME} [ERROR]: cannot place extension '#{container_name}' in previously defined group!"
+                return false
+              end
+              # remove group because after extension it will be added again
+              @context.push(@session_container.remove_group(container_name))
+            else
+              parent_container = @context[-1]
+              existing = parent_container.find_group(container_name)
+              if existing then
+                # remove group and add it to top of context stack
+                @context.push(parent_container.remove_group(container_name))
+              else
+                existing = parent_container.find_test(container_name)
                 if existing then
-                  @context.push(existing)
-                else
-                  @context.reverse_each { |it|
-                      existing = it.find_test(container_name)
-                      break if existing != nil
-                  }
-                  @context.push(existing) if existing
+                  # remove test and add it to top of context stack
+                  @context.push(parent_container.remove_test(container_name))
                 end
-                if !existing then
-                  STDERR.puts "#{ME} [ERROR]: extend #{container_name} does not extend a known container"
-                  return 0
-                end
+                # not found in groups, maybe a test of the current group is extended; search from the top of the context stack
+                # context_idx = 0
+                # @context.reverse.each_with_index { |it, idx|
+                    # existing = it.find_test(container_name)
+                    # puts "    existing #{container_name} = #{existing.ctype.to_s} #{existing}" if existing
+                    # if existing != nil
+                      # context_idx = @context.size - 1 - idx
+                      # break
+                    # end
+                # }
+                # @context.push(@context.delete_at(context_idx)) if existing
+              end
+              if !existing then
+                STDERR.puts "#{ME} [ERROR]: extend '#{container_name}' does not extend a known container"
+                return false
+              end
             end
           end
       end
@@ -151,13 +176,13 @@ module Vmgr
                 @session_container = SessionContainer.new("unknown", description, @kind) if !@session_container
                 @session_container.add_group(container)
             else
-                STDERR.puts "#{ME} [ERROR]: container nesting error for #{container.ctype.to_s} #{container.name}"
+                STDERR.puts "#{ME} [ERROR]: container nesting error for #{container.ctype.to_s} '#{container.name}'"
                 return false
             end
           else
             parent_container = @context[-1]
             if parent_container.ctype == :test then
-                STDERR.puts "#{ME} [ERROR]: cannot nest container #{container.ctype.to_s} #{container.name} in #{parent_container.ctype}"
+                STDERR.puts "#{ME} [ERROR]: cannot nest container #{container.ctype.to_s} '#{container.name}' in #{parent_container.ctype}"
                 return false
             end
             case container.ctype
@@ -166,7 +191,7 @@ module Vmgr
             when :test
                 parent_container.add_test(container)
             else
-                STDERR.puts "#{ME} [ERROR]: container nesting error for #{container.ctype.to_s} #{container.name}"
+                STDERR.puts "#{ME} [ERROR]: container nesting error for #{container.ctype.to_s} '#{container.name}'"
                 return false
             end
           end

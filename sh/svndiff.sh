@@ -103,9 +103,10 @@ if [ $? -eq 0 ]; then
     else
       $tool $file $outfile
     fi
-    \rm -f $outfile
+    rm $outfile
 else
     echo $this: ERROR from command \"$tool\", aborting.
+    rm -f $outfile
     exit 1
 fi
 exit 0
