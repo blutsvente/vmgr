@@ -96,6 +96,9 @@ module Vmgr
       @session.session_container = flat_session_container
       @session.write_vsif("_flattened.vsif") if @debug;
       @session.write_tl(@tl_out);
+    else
+      STDERR.puts("#{ME} [ERROR]: error reading " + @vsif_file)
+      exit 1
     end
 
     Dir.chdir(save_dir)
