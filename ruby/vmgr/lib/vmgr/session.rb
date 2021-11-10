@@ -23,7 +23,7 @@ module Vmgr
           # The vsif regexp requires preprocessing to remove leading whitespace
           @@vsif_container_re   = Regexp.new(/^(session|group|test|extend)\s+(\w+)\s*/)
           @@vsif_entry_re       = Regexp.new(/^(\w+)\s*:\s*(<text>|")*([^;"<]+)(<\/text>|")*\s*;/)
-          @@include_re          = Regexp.new('^#include\s+\"([\w+\.]+)\"')
+          @@include_re          = Regexp.new('^#include\s+\"([^\"]+)\"')
       end
 
       # Read all unique .vsof files of a session and populate the runs member
