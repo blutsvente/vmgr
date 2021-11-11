@@ -1,0 +1,4 @@
+// Test for include directive
+
+#include "include_2/file_b.vsif"
+

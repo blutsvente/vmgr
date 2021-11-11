@@ -52,7 +52,7 @@ module Vmgr
           brace_open         = false;
 
           lines.concat(pre_process_vsif(filename));
-          return false if lines.empty?
+          STDERR.puts "#{ME} [WARNING]: file #{filename} empty\n" if lines.empty?
 
           # Iterate over all lines and parse the {... } container entries
           # TODO: does not create container object with no attributes (e.g. no {...};)
@@ -248,7 +248,8 @@ module Vmgr
                 next if line =~ /^\s*\/\//    # skip comments
                 match = @@include_re.match(line)
                 if match then
-                  result.concat(pre_process_vsif(match[1]))
+                  include_file = locate_file(filename, match[1])
+                  result.concat(pre_process_vsif(include_file))
                 else
                   result << line.chomp
                 end
@@ -258,6 +259,25 @@ module Vmgr
             return []
           end
           return result
+      end
+
+      # Try to locate an include file, with priorites
+      # 1. absolute path
+      # 2. relative path to working directory
+      # 3. relative path to path of includer
+      def locate_file(includer, includee)
+        if (includee =~ /^#{File::SEPARATOR}/) then
+          return includee
+        end
+
+        full_path = File.expand_path(includee, Dir.getwd());
+        if (File.exist?(full_path)) then
+          return full_path
+        else
+          includer_path = File.dirname(includer)
+          full_path = File.expand_path(includee, includer_path)
+          return full_path
+        end
       end
 
       # Parse a single-run vsof file and return its run-container
