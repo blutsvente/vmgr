@@ -1,5 +1,5 @@
 // Test for include directive
 
 #include "include/file_a.vsif"
-#include "/home/thdx/bla.vsif"
+//#include "/home/thdx/bla.vsif"
 
