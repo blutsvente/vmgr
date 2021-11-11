@@ -29,6 +29,7 @@ use constant _BAR_CHAR_ => '#';
 use constant _TIMEOUT_IN_SECONDS_ => 1000;
 use constant _REFRESH_RATE_SECONDS_ => 3;
 use constant _REFRESH_RATE_SECONDS_WHEN_IDLE_MAX_ => 60;
+use constant _MAX_RETRIES_FOR_ERRORS_ => 3;
 
 toolbox::check_exe("bjobs") || die "bjobs executable not found.\n";
 
@@ -55,7 +56,7 @@ my $pend_avg = 0;
 my $run_avg = 0;
 my $first_samples_seen = 0;
 my $samples = 0;
-my $max_retries_for_errors = 3;
+my $max_retries_for_errors = _MAX_RETRIES_FOR_ERRORS_;
 my $sleep_for = _REFRESH_RATE_SECONDS_;
 my $old_cols = 0;
 my $old_rows = 0;
@@ -100,13 +101,19 @@ while(1) {
       $scr->clrscr();
       $scr->resize();
 
+      # Render header
       $pend_avg = $pend_avg + ($pend - $pend_avg) / ($samples + 1);
       $run_avg = $run_avg + ($run - $run_avg) / ($samples + 1);
-      my $avg_str = sprintf("<PEND %.1f RUN %.1f>", $pend_avg, $run_avg);
+      my $avg_str = sprintf("avg: <PEND %.1f RUN %.1f>", $pend_avg, $run_avg);
       my $delta = ($n - $n_last);
+      my $pattern_str = $pattern;
+      my $delta_str = "delta/${sleep_for}s: <$delta>";
+      if (length($pattern) > 14) {
+         $pattern_str = sprintf("%.10s[..]", $pattern);
+      }
+      print "LSF jobs matching \"$pattern_str\": <", LOCALCOLOR RED, "PEND ${pend}" , " ", LOCALCOLOR BLUE, "RUN ${run}", RESET, "> $avg_str $delta_str";
 
-      # print "LSF jobs matching \"$pattern\": <PEND ${pend} RUN ${run}> avg: $avg_str delta/${sleep_for}s: <$delta>";
-      print "LSF jobs matching \"$pattern\": ", LOCALCOLOR RED, "PEND ${pend}" , " ", LOCALCOLOR BLUE, "RUN ${run}", RESET, "> avg: $avg_str delta/${sleep_for}s: <$delta>";
+      # Render progress bars
       render_bars($pend, $run);
 
       # Slow-down refresh if nothing happens
