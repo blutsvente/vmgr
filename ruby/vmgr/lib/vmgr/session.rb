@@ -261,23 +261,22 @@ module Vmgr
           return result
       end
 
-      # Try to locate an include file, with priorites
+      # Try to locate an include file, with search priorites, and return the likely[1] candidate's full path:
       # 1. absolute path
       # 2. relative path to working directory
       # 3. relative path to path of includer
+      # [1] does not do a final check whether the file exists which is left to the caller
       def locate_file(includer, includee)
         if (includee =~ /^#{File::SEPARATOR}/) then
           return includee
         end
 
         full_path = File.expand_path(includee, Dir.getwd());
-        if (File.exist?(full_path)) then
-          return full_path
-        else
+        if (not File.exist?(full_path)) then
           includer_path = File.dirname(includer)
           full_path = File.expand_path(includee, includer_path)
-          return full_path
         end
+        return full_path
       end
 
       # Parse a single-run vsof file and return its run-container
