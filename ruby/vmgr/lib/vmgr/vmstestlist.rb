@@ -9,13 +9,14 @@ module Vmgr
     #
     class VmsTestlist < Struct.new(:name, :handle)
 
-      # Only commonly used options are contained in this hash, to make them appear
+      # Options from the source .vsif are first searched for in the standard_options hash.
+      # Only commonly used options are in this hash, to make them appear
       # in the same order in the testlist; others are just concatenated w/o any
-      # particular order.
+      # particular order. They can also be renamed (hash key -> value mapping)
+      # Filtering can be done via filter_options hash (to remove unwanted options)
       # vms-option => alias
       attr_accessor :standard_options
-
-      @groups = Array.new()
+      attr_accessor :filter_options
 
       def initialize(_name, _handle)
          super(_name, _handle)
@@ -24,12 +25,15 @@ module Vmgr
             "test_group" => "",
             "num_seeds"  => "count",
             "rand_seed"  => "",
-            "sv_seed"    => "",
+            "sv_seed"    => "seed",
             "sim_args"   => "",
             "lsf_mem"    => "",
             "lsf_args"   => "",
             "lsf_queue"  => ""
          }
+         @filter_options = [
+            "sanity_count"
+         ]
          @groups = Array.new()
       end
 
@@ -74,30 +78,35 @@ module Vmgr
       # Options in @standard_options list are put first
       def get_row_str(test)
          cols = Array.new()
-         cols[0] = test.name
+         current_index = 0
+         cols[current_index] = test.name
+         current_index += 1
          test_work = test.clone()
-         current_index = 1
+         out_options = Hash.new()
 
-         # Collect all standard options first
+         # Collect all standard options first, apply aliasing
          @standard_options.each { | (option, alias_name) |
             if test_work.has_attribute(option)
-               out_option = "-" + option
-               out_value  = get_value_str(test_work, option) || ""
+               out_options[option] = get_value_str(test_work, option) || ""
                test_work.delete_attribute(option)
-            elsif alias_name != "" && test_work.has_attribute(alias_name)
-               out_option = "-" + option
-               out_value  = get_value_str(test_work, alias_name) || ""
+            end
+            if alias_name != "" && test_work.has_attribute(alias_name)
+               out_options[option] = get_value_str(test_work, alias_name) || ""
                test_work.delete_attribute(alias_name)
             else
                next
             end
+         }
 
-            cols[current_index] = out_option + " " + out_value
+         # Dump options in cols array
+         out_options.each { | (option, value) |
+            cols[current_index] = "-" + option + " " + value
             current_index += 1
          }
 
-         # Collect all remaining options
+         # Collect all remaining options, filtering out any unwanted ones
          test_work.hattribs.each_key { | option |
+            next if @filter_options.find_index(option) != nil
             out_option = "-" + option
             out_value  = get_value_str(test_work, option) || ""
             cols[current_index] = out_option + " " + out_value
@@ -113,7 +122,7 @@ module Vmgr
          unless result == nil
             # strip the <text> tags
             result.gsub!(%r{</?text>}, "")
-            # quote value if necessary
+            # quote value in vms_run-style if necessary
             if result =~ /\s/
                result = "' " + result + "'"
             end

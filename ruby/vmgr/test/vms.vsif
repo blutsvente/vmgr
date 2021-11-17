@@ -20,6 +20,7 @@ group level_one {
              seed: 1; 
              sim_args:<text>+ONE +TWO=xxx</text>;
              lsf_mem: 0; // will be overridden
+             sanity_count: 10;
         };
 
         group videoio {
@@ -33,7 +34,7 @@ group level_one {
 
         test bar_test { seed: 2;  };
 
-        sv_seed: 10;
+        seed: 10;
     };
 
     extend level_two {
