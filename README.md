@@ -1,2 +1,2 @@
-# linux-productivity-scripts
-Helper scripts I regularly use at clients and for which I wanted a central repository
+# vmgr
+Collection of scripts and a class library to process the Cadence VManager .vsif/.vsof formats
