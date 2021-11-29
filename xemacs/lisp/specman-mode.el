@@ -1,1 +1,0 @@
-specman-mode_1.23-scott.el
