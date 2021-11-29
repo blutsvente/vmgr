@@ -1,7 +1,7 @@
 # Ruby Vmgr (Vmanager) library
 #
 # Creation Date: May/2021
-# Author: <thorsten.dworzak@verilab.com>
+# Author: <tlemail69-github@yahoo.com>
 # ---
 module Vmgr
     #

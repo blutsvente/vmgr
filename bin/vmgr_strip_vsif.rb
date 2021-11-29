@@ -5,7 +5,7 @@
 # Reads a .vsif file (usually exported from the re-run dialog of a session)
 # and removes all attributes not required to re-run it.
 # ---
-# Author: Thorsten Dworzak <thorsten.dworzak@verilab.com>
+# Author: Thorsten Dworzak <tlemail69-github@yahoo.com>
 # ---
 
 require 'getoptlong'

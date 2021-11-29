@@ -5,7 +5,7 @@
 # Reads a .vsif file and create a vms_run testlist.
 # See USAGE.
 # ---
-# Author: Thorsten Dworzak <thorsten.dworzak@verilab.com>
+# Author: Thorsten Dworzak <tlemail69-github@yahoo.com>
 # ---
 #
 require 'getoptlong'

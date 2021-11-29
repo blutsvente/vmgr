@@ -5,7 +5,7 @@
 # Reads a .vsif file and creates a reduced sanity .vsif file.
 # See USAGE.
 # ---
-# Author: Thorsten Dworzak <thorsten.dworzak@verilab.com>
+# Author: Thorsten Dworzak <tlemail69-github@yahoo.com>
 # ---
 #
 require 'getoptlong'

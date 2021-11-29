@@ -4,7 +4,7 @@
 #
 # Compares the .vsof files of two vManager sessions
 # ---
-# Author: Thorsten Dworzak <thorsten.dworzak@verilab.com>
+# Author: Thorsten Dworzak <tlemail69-github@yahoo.com>
 # ---
 
 require 'getoptlong'
