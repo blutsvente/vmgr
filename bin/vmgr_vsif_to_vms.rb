@@ -55,9 +55,9 @@ module Vmgr
     @vsif_dir = "."
     @tl_out = ""
     @debug = false
-    opts = GetoptLong.new( [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+    opts = GetoptLong.new( [ '--help', '-h', GetoptLong::NO_ARGUMENT],
                         [ '--out' , '-o', GetoptLong::OPTIONAL_ARGUMENT],
-                        [ '--debug', '-d', GetoptLong::OPTIONAL_ARGUMENT]
+                        [ '--debug', '-d', GetoptLong::NO_ARGUMENT]
                         )
     opts.each { | opt, arg |
       case opt
