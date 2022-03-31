@@ -75,6 +75,10 @@ module Vmgr
                 puts "group #{it.name}" if @debug
                 new_group = GroupContainer.new(it.name)
                 Vmgr.make_sanity_core(it, new_group)
+
+                Vmgr.override_count_attribute(it, new_group)
+                Vmgr.override_seed_attribute(it, new_group)
+
                 if (new_group.has_attribute("groups") and !new_group.groups.empty?) or (new_group.has_attribute("tests") and !new_group.tests.empty?) then
                   to_container.add_group(new_group)
                 else
@@ -87,50 +91,60 @@ module Vmgr
                 new_test = TestContainer.new(it.name)
                 Vmgr.make_sanity_core(it, new_test)
 
-                begin
-                  # override 'count' attribute
-                  count = 1
-                  if it.has_attribute("sanity_count") then
-                    count = Integer(it.sanity_count.strip || ''); # avoid throwing TypeEerror for nil
-                    new_test.add_attribute("count", count)
-                  else
-                    count = Integer(it.count.strip || '') if it.has_attribute("count")
-                    new_test.delete_attribute("count")
-                  end
-                  if count == 0 then
-                    puts "#{ME} [INFO]: skipping test #{it.name} with count 0"
-                    next
-                  end
-                rescue ArgumentError
-                  abort("#{ME} [ERROR]: could not convert value to integer; in context = #{new_test.ctype} #{new_test.name}")
-                end
+                next if (0 == Vmgr.override_count_attribute(it, new_test))
 
-                # override 'seed' attribute
-                if it.has_attribute("sanity_seed") then
-                  new_test.add_attribute("seed", it.sanity_seed)
-                else
-                  new_test.delete_attribute("seed")
-                end
+                Vmgr.override_seed_attribute(it, new_test)
                 to_container.add_test(new_test)
             }
           else
             # replace count+seed from session + group containers
             skip = false
-            if from_container.ctype != :test and ["count", "seed"].include?(key) then
+            if from_container.ctype != :test and ["count", "seed", "sv_seed"].include?(key) then
                 skip = true
             end
-            # add default count to group
-            if from_container.ctype == :group then
-                to_container.add_attribute("count", "1")
-            end
-            # add default seed to group
-            if from_container.ctype == :group then
-                to_container.add_attribute("seed", "1")
+            # add default count/seed to group and session
+            if from_container.ctype == :group or from_container.ctype == :session then
+                seed = from_container.has_attribute("sanity_seed") ? from_container.sanity_seed : 1;
+                to_container.add_attribute("seed", seed)
+                count = from_container.has_attribute("sanity_count") ? from_container.sanity_count : 1;
+                to_container.add_attribute("count", count)
             end
 
             to_container.add_attribute(key, value) if !skip
           end
       }
+    end
+
+    def Vmgr.override_count_attribute(from_container, new_container)
+      begin
+        # override 'count' attribute
+        count = 1
+        if from_container.has_attribute("sanity_count") then
+          count = Integer(from_container.sanity_count.strip || ''); # avoid throwing TypeEerror for nil
+          new_container.add_attribute("count", count)
+        else
+          count = Integer(from_container.count.strip || '') if from_container.has_attribute("count")
+          new_container.delete_attribute("count")
+        end
+        if count == 0 then
+          puts "#{ME} [INFO]: skipping #{from_container.ctype} #{from_container.name} with count 0"
+        end
+      rescue ArgumentError
+        abort("#{ME} [ERROR]: could not convert value to integer; in context = #{from_container.ctype} #{from_container.name}")
+      end
+      return count
+    end
+
+    def Vmgr.override_seed_attribute(from_container, new_container)
+      # override 'seed' attribute
+      seed = 1;
+      if from_container.has_attribute("sanity_seed") then
+        seed = from_container.sanity_seed
+        new_container.add_attribute("seed", seed)
+      else
+        new_container.delete_attribute("seed")
+      end
+      return seed
     end
 
     #
