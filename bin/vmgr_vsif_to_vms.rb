@@ -72,7 +72,7 @@ module Vmgr
     }
 
     if ARGV.size != 1 then
-      abort("#{ME} [ERROR]: must supply one .vsif file as input\n#{$USAGE)")
+      abort("#{ME} [ERROR]: must supply one .vsif file as input\n#{$USAGE}")
     else
       @vsif_dir = File.dirname(ARGV[0])
       @vsif_file = File.basename(ARGV[0], ".vsif") + ".vsif"
