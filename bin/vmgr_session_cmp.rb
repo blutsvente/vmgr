@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 #
 # Ruby Vmgr (Vmanager) library
 #
@@ -89,9 +89,7 @@ module Vmgr
    }
 
    if session_ids.size != 2 then
-      puts "#{ME} [ERROR]: must supply 2 session IDs"
-      puts $USAGE
-      exit 1
+      abort("#{ME} [ERROR]: must supply 2 session IDs\n#{$USAGE}")
    end
 
    # Find the actual session names
@@ -113,8 +111,7 @@ module Vmgr
 
 
    if session_names.size != 2 then
-      puts "#{ME} [ERROR]: can't find all sessions matching the supplied IDs: #{session_ids.values.join(' ')} (found #{session_names.size}"
-      exit 1
+      abort("#{ME} [ERROR]: can't find all sessions matching the supplied IDs: #{session_ids.values.join(' ')} (found #{session_names.size}")
    end
 
    # Now get two session data sets for comparison
@@ -135,13 +132,11 @@ module Vmgr
    }
 
    if sessions.size != 2
-      puts "#{ME} [ERROR]: failed to read one or both session .vsof files"
-      exit 1
+      abort("#{ME} [ERROR]: failed to read one or both session .vsof files")
    end
 
    if sessions[0].runs.size != sessions[1].runs.size
       puts "#{ME} [WARNING]: number of runs differs between sessions: #{sessions[0].kind} #{sessions[0].runs.size} vs. #{sessions[1].kind} #{sessions[1].runs.size}"
-      # exit 1
    end
 
    # Sort by seed, assuming the seeds are unique, and store in new list

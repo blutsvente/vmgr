@@ -72,9 +72,7 @@ module Vmgr
     }
 
     if ARGV.size != 1 then
-      STDERR.puts "#{ME} [ERROR]: must supply one .vsif file as input"
-      STDERR.puts $USAGE
-      exit 1
+      abort("#{ME} [ERROR]: must supply one .vsif file as input\n#{$USAGE)")
     else
       @vsif_dir = File.dirname(ARGV[0])
       @vsif_file = File.basename(ARGV[0], ".vsif") + ".vsif"
@@ -101,8 +99,7 @@ module Vmgr
         STDERR.puts "#{ME} [WARNING]: nothing to be done\n"
       end
     else
-      STDERR.puts "#{ME} [ERROR]: error reading " + @vsif_file
-      exit 1
+      abort("#{ME} [ERROR]: error reading " + @vsif_file)
     end
 
     Dir.chdir(save_dir)

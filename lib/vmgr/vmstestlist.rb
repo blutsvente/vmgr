@@ -32,7 +32,8 @@ module Vmgr
             "lsf_queue"  => ""
          }
          @filter_options = [
-            "sanity_count"
+            "sanity_count",
+            "sanity_seed"
          ]
          @groups = Array.new()
       end

@@ -1,9 +1,10 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 #
 # Ruby Vmgr (Vmanager) library
 #
 # Reads a .vsif file (usually exported from the re-run dialog of a session)
 # and removes all attributes not required to re-run it.
+# !!IN DEVELOPMENT!!
 # ---
 # Author: Thorsten Dworzak <tlemail69-github@yahoo.com>
 # ---
@@ -21,6 +22,7 @@ require File.expand_path('../lib/vmgr/session.rb', File.dirname(__FILE__))
 $USAGE="Usage:
 #{$0} [<options>] <vsif-file>
 
+!!IN DEVELOPMENT!!
 This script reads a .vsif file and strips it of all attributes not needed for re-run. The motivation
 is to be able to use a .vsif file exported from any session (i.e. not necessarily the user's)..
 
@@ -57,9 +59,7 @@ module Vmgr
     }
 
     if ARGV.size != 1 then
-      puts "#{ME} [ERROR]: must supply one vsif file as input"
-      puts $USAGE
-      exit 1
+      abort("#{ME} [ERROR]: must supply one vsif file as input\n#{$USAGE}")
     else
       vsif_file = ARGV[0];
     end

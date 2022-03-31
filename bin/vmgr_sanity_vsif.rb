@@ -46,6 +46,7 @@ Example:
 module Vmgr
 
     ME = File.basename(__FILE__, ".rb")
+    @debug = false
 
     # Entry function to populate a new sanity session and override the old session container
     def Vmgr.make_sanity()
@@ -71,12 +72,18 @@ module Vmgr
             next
           when "groups"
             value.each { |it|
+                puts "group #{it.name}" if @debug
                 new_group = GroupContainer.new(it.name)
                 Vmgr.make_sanity_core(it, new_group)
-                to_container.add_group(new_group) if new_group.has_attribute("tests") and !new_group.tests.empty?
+                if (new_group.has_attribute("groups") and !new_group.groups.empty?) or (new_group.has_attribute("tests") and !new_group.tests.empty?) then
+                  to_container.add_group(new_group)
+                else
+                  STDERR.puts  "#{ME} [WARNING]: skipping group #{it.name} that contains neither groups nor tests"
+                end
             }
           when "tests"
             value.each { |it|
+                puts "test #{it.name}" if @debug
                 new_test = TestContainer.new(it.name)
                 Vmgr.make_sanity_core(it, new_test)
 
@@ -95,8 +102,7 @@ module Vmgr
                     next
                   end
                 rescue ArgumentError
-                  STDERR.puts "#{ME} [ERROR]: could not convert value to integer; in context = #{new_test.ctype} #{new_test.name}"
-                  exit 1
+                  abort("#{ME} [ERROR]: could not convert value to integer; in context = #{new_test.ctype} #{new_test.name}")
                 end
 
                 # override 'seed' attribute
@@ -148,9 +154,7 @@ module Vmgr
     }
 
     if ARGV.size != 1 then
-      STDERR.puts "#{ME} [ERROR]: must supply one vsif file as input"
-      STDERR.puts $USAGE
-      exit 1
+      abort("#{ME} [ERROR]: must supply one vsif file as input\n#{$USAGE}")
     else
       @vsif_dir = File.dirname(ARGV[0])
       @vsif_file = File.basename(ARGV[0], ".vsif") + ".vsif"
