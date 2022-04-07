@@ -7,7 +7,7 @@ module Vmgr
     #
     # Class representing test-container and its attributes
     #
-    class TestContainer < Container # Struct.new(:test_name, :seed, :count, :top_files)
+    class TestContainer < Container
 
       def initialize(name)
           super(name, :test)

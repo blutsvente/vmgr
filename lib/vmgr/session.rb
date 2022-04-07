@@ -9,15 +9,16 @@ module Vmgr
     # Class collecting all test or run-containers of a vmanager session
     # runs are extracted from .vsof files, tests (in groups) from .vsif files
     #
-    class Session < Struct.new(:description)
+    class Session < Struct.new(:description, :name)
 
       attr_accessor :session_container
       attr_accessor :kind
 
       # Initialize
-      def initialize(_description)
-          super(_description)
+      def initialize(_description, _kind = :vsif, _name = "Session")
+          super(_description, _name)
           @session_container    = nil
+          @kind                 = _kind
           @@block_re            = Regexp.new(/(\w+)\s+([\w"]+)\s+\{/)
           @@vsof_entry_re       = Regexp.new(/(\w+)\s+:\s+(<text>\s*)*([^;<]+)(<\/text>)*\s*;/)
           # The vsif regexp requires preprocessing to remove leading whitespace
@@ -36,7 +37,7 @@ module Vmgr
             if run_container then
                 @hattribs["runs"].push(run_container)
             else
-                STDERR.puts "#{ME} [ERROR]: no single-run container found in vsof file #{filename}"
+                STDERR.puts "#{name} [ERROR]: no single-run container found in vsof file #{filename}"
             end
           }
       end
@@ -52,7 +53,7 @@ module Vmgr
           brace_open         = false;
 
           lines.concat(pre_process_vsif(filename));
-          STDERR.puts "#{ME} [WARNING]: file #{filename} empty\n" if lines.empty?
+          STDERR.puts "#{name} [WARNING]: file #{filename} empty\n" if lines.empty?
 
           # Iterate over all lines and parse the {... } container entries
           # TODO: does not create container object with no attributes (e.g. no {...};)
@@ -86,7 +87,7 @@ module Vmgr
 
                 if line =~ /\}\s*(;)?\s*/ then
                 	if $1 != ";" then
-                		STDERR.puts "#{ME} [ERROR]: read_vsif(): parse error, closing brace without semicolon (#{line.red})"
+                		STDERR.puts "#{name} [ERROR]: read_vsif(): parse error, closing brace without semicolon (#{line.red})"
                 		return false
                 	end
 
@@ -101,7 +102,7 @@ module Vmgr
                   if /^\s*\/\//.match(line)
                     line = ""
                   else
-                    puts "#{ME} [WARNING]: read_vsif(): suspicious trailing string found or missing semicolon (#{line.red})"
+                    puts "#{name} [WARNING]: read_vsif(): suspicious trailing string found or missing semicolon (#{line.red})"
                   end
                 end
             end while line.length > 0 && match_found
@@ -124,13 +125,13 @@ module Vmgr
           when "extend"
             if @context.size == 0 then
               if !@session_container then
-                STDERR.puts "#{ME} [ERROR]: extension of '#{container_name}' before container definition (currently unsupported)"
+                STDERR.puts "#{name} [ERROR]: extension of '#{container_name}' before container definition (currently unsupported)"
                 return false
               end
               # search extended container in groups
               existing = @session_container.find_group(container_name)
               if !existing then
-                STDERR.puts "#{ME} [ERROR]: cannot place extension '#{container_name}' in previously defined group!"
+                STDERR.puts "#{name} [ERROR]: cannot place extension '#{container_name}' in previously defined group!"
                 return false
               end
               # remove group because after extension it will be added again
@@ -160,7 +161,7 @@ module Vmgr
                 # @context.push(@context.delete_at(context_idx)) if existing
               end
               if !existing then
-                STDERR.puts "#{ME} [ERROR]: extend '#{container_name}' does not extend a known container"
+                STDERR.puts "#{name} [ERROR]: extend '#{container_name}' does not extend a known container"
                 return false
               end
             end
@@ -176,13 +177,13 @@ module Vmgr
                 @session_container = SessionContainer.new("unknown", description, @kind) if !@session_container
                 @session_container.add_group(container)
             else
-                STDERR.puts "#{ME} [ERROR]: container nesting error for #{container.ctype.to_s} '#{container.name}'"
+                STDERR.puts "#{name} [ERROR]: container nesting error for #{container.ctype.to_s} '#{container.name}'"
                 return false
             end
           else
             parent_container = @context[-1]
             if parent_container.ctype == :test then
-                STDERR.puts "#{ME} [ERROR]: cannot nest container #{container.ctype.to_s} '#{container.name}' in #{parent_container.ctype}"
+                STDERR.puts "#{name} [ERROR]: cannot nest container #{container.ctype.to_s} '#{container.name}' in #{parent_container.ctype}"
                 return false
             end
             case container.ctype
@@ -191,7 +192,7 @@ module Vmgr
             when :test
                 parent_container.add_test(container)
             else
-                STDERR.puts "#{ME} [ERROR]: container nesting error for #{container.ctype.to_s} '#{container.name}'"
+                STDERR.puts "#{name} [ERROR]: container nesting error for #{container.ctype.to_s} '#{container.name}'"
                 return false
             end
           end
@@ -227,7 +228,7 @@ module Vmgr
           File.open(filename, "w") do |file|
             @session_container.write(file)
           end
-          puts "#{ME} [INFO]: wrote #{filename}"
+          puts "#{name} [INFO]: wrote #{filename}"
       end
 
       # Write the content to file handle in vms_run testlist format
@@ -235,7 +236,7 @@ module Vmgr
         File.open(filename, "w") do |file|
           @session_container.write_tl(file)
         end
-        puts "#{ME} [INFO]: wrote #{filename}"
+        puts "#{name} [INFO]: wrote #{filename}"
       end
 
       # Slurp the .vsif and it's includes into an array containing each line
@@ -255,7 +256,7 @@ module Vmgr
                 end
             }
           rescue Exception
-            STDERR.puts("#{ME} [ERROR]: File I/O: #{filename}")
+            STDERR.puts("#{name} [ERROR]: File I/O: #{filename}")
             return []
           end
           return result
@@ -318,7 +319,7 @@ module Vmgr
                       if match then
                         value = match[1]
                       else
-                        STDERR.puts "#{ME} [ERROR]: could not extract testname from parent_run attribute (file #{filename} line #{n_line}: #{line})"
+                        STDERR.puts "#{name} [ERROR]: could not extract testname from parent_run attribute (file #{filename} line #{n_line}: #{line})"
                         value = "UNKNOWN"
                       end
 
@@ -333,7 +334,7 @@ module Vmgr
                   when "session_output"
                       # check if this is the correct file-type
                       if (attrib == "session_type" && value != "single_run")
-                        STDERR.puts "#{ME} [ERROR]: session_type #{value} not supported (file #{filename} line #{n_line}; must be single_run.)"
+                        STDERR.puts "#{name} [ERROR]: session_type #{value} not supported (file #{filename} line #{n_line}; must be single_run.)"
                         return nil
                       end
                   end

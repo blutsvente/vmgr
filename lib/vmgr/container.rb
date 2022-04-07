@@ -5,8 +5,9 @@
 # ---
 # Base class for vsif/vsof container
 module Vmgr
+
     #
-    # Base class representing any type (:ctype) of vsif/vsof containers
+    # Base class representing any type (symbol :ctype) of vsif/vsof containers
     #
     class Container
 
@@ -100,16 +101,29 @@ module Vmgr
             end
             return nil
           end
-
       end
 
-      # Write (scalar) attributes to handle
+      # Write (non-list) attributes to handle; quote value with text-tags if it contains a whitespace
       def write(handle, indent=0)
           handle.puts INDENT * indent + "#{ctype.to_s} #{name} {"
           @hattribs.each { |key, value|
-            handle.puts INDENT * (indent + 1) + "#{key}: #{value};"
+            handle.puts INDENT * (indent + 1) + render_key_value_pair(key, value)
           }
           handle.puts INDENT * indent + "};"
+      end
+
+      # Render key+value to string in .vsif format
+      def render_key_value_pair(key, value)
+        eff_value = value
+        if not is_numeric?(eff_value) and eff_value =~ /\s/ and not eff_value =~ /^<text>/
+          eff_value = "<text>" + value + "</text>"
+        end
+        return "#{key}: #{eff_value};"
+      end
+
+      # Return true if value of input variable is a number
+      def is_numeric?(value)
+         Float(value) != nil rescue false
       end
     end
 end

@@ -29,7 +29,7 @@ module Vmgr
                   hcontainer.write(handle, indent + 1)
                 }
             else
-                handle.puts INDENT * (indent + 1) + "#{key}: #{value};"
+              handle.puts INDENT * (indent + 1) + render_key_value_pair(key, value)
             end
           }
           handle.puts INDENT * indent + "};"

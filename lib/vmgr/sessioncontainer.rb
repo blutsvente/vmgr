@@ -19,7 +19,7 @@ module Vmgr
       add_list_attribute_accessors("group")
       add_list_attribute_accessors("run")
 
-      def initialize(_name, _description, _kind = "")
+      def initialize(_name, _description, _kind = :vsif)
           super(_name, :session)
           @description = _description
           @hattribs = { "groups" => [],
@@ -36,7 +36,7 @@ module Vmgr
             next if ["groups","tests"].include?(key)
             next if kind == :vsif and key == "runs"
             next if kind == :vsof and key == "groups"
-            handle.puts INDENT * (indent + 1) + "#{key}: #{value};"
+            handle.puts INDENT * (indent + 1) + render_key_value_pair(key, value)
           }
           handle.puts INDENT * indent + "};"
 
@@ -57,7 +57,7 @@ module Vmgr
       def write_tl(handle)
         handle.puts "# #{@description}"
         if not self.has_attribute("groups")
-          STDERR.puts "#{ME} [WARNING]: Session #{self.name} has no groups, nothing to be done"
+          STDERR.puts "#{@name} [WARNING]: Session #{self.name} has no groups, nothing to be done"
           return
         end
 
@@ -65,7 +65,7 @@ module Vmgr
 
         self.groups.each { |group|
           if not group.has_attribute("tests")
-            STDERR.puts "#{ME} [WARNING]: Group #{group.name} has no tests, nothing to be done"
+            STDERR.puts "#{@name} [WARNING]: Group #{group.name} has no tests, nothing to be done"
           else
             testlist.add_group_container(group)
           end
