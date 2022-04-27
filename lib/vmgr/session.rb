@@ -191,7 +191,7 @@ module Vmgr
             end
             case container.ctype
             when :group
-                if parent_container.find_group_index(container) != nil then
+                if parent_container.find_group_index(container.name) != nil then
                   STDERR.puts "#{name} [WARNING]: trying to add #{container.ctype.to_s} '#{container.name}' which already exists"
                 end
                 parent_container.add_group(container)
