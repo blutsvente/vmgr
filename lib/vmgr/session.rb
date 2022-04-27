@@ -175,6 +175,9 @@ module Vmgr
           if @context.size == 0
             if container.ctype == :group then
                 @session_container = SessionContainer.new("unknown", description, @kind) if !@session_container
+                if @session_container.find_group_index(container.name) != nil then
+                  STDERR.puts "#{name} [WARNING]: adding #{container.ctype.to_s} '#{container.name}' which already exists"
+                end
                 @session_container.add_group(container)
             else
                 STDERR.puts "#{name} [ERROR]: container nesting error for #{container.ctype.to_s} '#{container.name}'"
@@ -188,6 +191,9 @@ module Vmgr
             end
             case container.ctype
             when :group
+                if parent_container.find_group_index(container) != nil then
+                  STDERR.puts "#{name} [WARNING]: trying to add #{container.ctype.to_s} '#{container.name}' which already exists"
+                end
                 parent_container.add_group(container)
             when :test
                 parent_container.add_test(container)

@@ -50,3 +50,8 @@ group flat {
       sim_args: <text>+SPECIAL</text>;
    };
 };
+
+// duplicate group-name, triggers warning
+group flat {
+   test kkk { count: 2; };
+};
