@@ -51,7 +51,13 @@ group flat {
    };
 };
 
-// duplicate group-name, triggers warning
-group flat {
-   test kkk { count: 2; };
+group error {
+   test random_test  { sim_args :<text>+RUN_XIP_MODE +ONLY_AXI_XIP</text>;};
+   test random_test  { sim_args :  <text>+RUN_XIP_MODE +ONLY_SLOW_XIP</text>;};
+   test random_test  { sim_args: <text>+RUN_MMIO_MODE </text>;};
 };
+
+// duplicate group-name, triggers warning
+//group flat {
+//   test kkk { count: 2; };
+//};

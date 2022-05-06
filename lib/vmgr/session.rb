@@ -23,11 +23,13 @@ module Vmgr
           @@vsof_entry_re       = Regexp.new(/(\w+)\s+:\s+(<text>\s*)*([^;<]+)(<\/text>)*\s*;/)
           # The vsif regexp requires preprocessing to remove leading whitespace
           @@vsif_container_re   = Regexp.new(/^(session|group|test|extend)\s+(\w+)\s*/)
-          @@vsif_entry_re       = Regexp.new(/^(\w+)\s*:\s*(<text>|")*([^;"<]+)(<\/text>|")*\s*;/)
+          @@vsif_entry_key_re   = Regexp.new(/^(\w+)\s*(:)*/)
+          @@vsif_entry_value_re = Regexp.new(/^(<text>|")*([^;"<]+)(<\/text>|")*\s*;/)
           @@include_re          = Regexp.new('^#include\s+\"([^\"]+)\"')
       end
 
       # Read all unique .vsof files of a session and populate the runs member
+      # Returns false on error
       def read_vsofs(filenames)
           @kind = :vsof
           # Iterate over all .vsof files of a session and extract a run-container for each
@@ -38,11 +40,14 @@ module Vmgr
                 @hattribs["runs"].push(run_container)
             else
                 STDERR.puts "#{name} [ERROR]: no single-run container found in vsof file #{filename}"
+                return false
             end
           }
+          return true
       end
 
-      # Read a .vsif file and populate the groups member
+      # Read a .vsif file and populate the groups member; returns false for some errors (other errors
+      # trigger only a message on STDERR)
       def read_vsif(filename)
           @kind              = :vsif
           @context           = []
@@ -80,7 +85,8 @@ module Vmgr
 
                 if brace_open then
                   # Pick up attributes
-                  match_found, line = parse_vsif_attribs(line)
+                  match_found, line, parse_error = parse_vsif_attribs(line)
+                  return false if parse_error
                 end
 
                 next if match_found
@@ -205,6 +211,8 @@ module Vmgr
           return true
       end
 
+      # Parse an attribute of the form <key>:<value>
+      # Returns three variables
       def parse_vsif_attribs(str)
           if @context.size == 0 then
             container = @session_container
@@ -212,21 +220,35 @@ module Vmgr
             container = @context[-1]
           end
           match_found = false
-          match = @@vsif_entry_re.match(str)
-          if match then
-            match_found = true
-            key         = match[1];
-            if match[2] then
-                value = "<text>"+match[3]+"</text>"
+          err = false
+          match_key = @@vsif_entry_key_re.match(str)
+          if match_key then
+            key         = match_key[1];
+            if not match_key[2] then
+              STDERR.puts "#{name} [ERROR]: attribute '#{key}' for #{container.ctype.to_s} '#{container.name}' misses : (colon) separator"
+              err = true
             else
-                value = match[3];
+              str         = match_key.post_match.strip
+              match_value = @@vsif_entry_value_re.match(str)
+              if match_value then
+                match_found = true
+                if match_value[1] then
+                  value = "<text>"+match_value[2]+"</text>"
+                else
+                  value = match_value[2];
+                end
+
+                if value.strip.length != 0
+                  container.add_attribute(key, value)
+                end
+                str = match_value.post_match.strip
+              else
+                STDERR.puts "#{name} [ERROR]: attribute '#{key}' for #{container.ctype.to_s} '#{container.name}': could not parse value #{str.red}"
+                err = true
+              end
             end
-            if value.strip.length != 0
-                container.add_attribute(key, value)
-            end
-            str = match.post_match.strip
           end
-          return match_found, str
+          return match_found, str, err
       end
 
       # Write the content to file handle
@@ -245,7 +267,8 @@ module Vmgr
         puts "#{name} [INFO]: wrote #{filename}"
       end
 
-      # Slurp the .vsif and it's includes into an array containing each line
+      # Slurp the .vsif and it's includes into an array containing each line.
+      # Returns empty array if there was an error.
       def pre_process_vsif(filename)
           result = [];
           begin
