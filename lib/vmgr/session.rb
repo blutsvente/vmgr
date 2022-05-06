@@ -232,7 +232,6 @@ module Vmgr
               str         = match_key.post_match.strip
               match_value = @@vsif_entry_value_quoted_re.match(str)
               if match_value then
-                puts "value str #{str} match #{match_value[1]}"
                 match_found = true
                 value = "<text>"+match_value[1]+"</text>"
               else
