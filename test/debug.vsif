@@ -52,7 +52,8 @@ group flat {
 };
 
 group error {
-   test random_test  { sim_args :<text>+RUN_XIP_MODE +ONLY_AXI_XIP</text>;};
+   test random_test  {  };
+   test random_test  { bla:1; };
    test random_test  { sim_args :  <text>+RUN_XIP_MODE +ONLY_SLOW_XIP</text>;};
    test random_test  { sim_args: <text>+RUN_MMIO_MODE </text>;};
 };

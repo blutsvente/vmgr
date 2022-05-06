@@ -17,15 +17,16 @@ module Vmgr
       # Initialize
       def initialize(_description, _kind = :vsif, _name = "Session")
           super(_description, _name)
-          @session_container    = nil
-          @kind                 = _kind
-          @@block_re            = Regexp.new(/(\w+)\s+([\w"]+)\s+\{/)
-          @@vsof_entry_re       = Regexp.new(/(\w+)\s+:\s+(<text>\s*)*([^;<]+)(<\/text>)*\s*;/)
-          # The vsif regexp requires preprocessing to remove leading whitespace
-          @@vsif_container_re   = Regexp.new(/^(session|group|test|extend)\s+(\w+)\s*/)
-          @@vsif_entry_key_re   = Regexp.new(/^(\w+)\s*(:)*/)
-          @@vsif_entry_value_re = Regexp.new(/^(<text>|")*([^;"<]+)(<\/text>|")*\s*;/)
-          @@include_re          = Regexp.new('^#include\s+\"([^\"]+)\"')
+          @session_container           = nil
+          @kind                        = _kind
+          @@block_re                   = Regexp.new(/(\w+)\s+([\w"]+)\s+\{/)
+          @@vsof_entry_re              = Regexp.new(/(\w+)\s+:\s+(<text>\s*)*([^;<]+)(<\/text>)*\s*;/)
+          # The vsif regexps deliberately don't include leading white-space, requires preprocessing to remove it
+          @@vsif_container_re          = Regexp.new(/^(session|group|test|extend)\s+(\w+)\s*/)
+          @@vsif_entry_key_re          = Regexp.new(/^(\w+)\s*(:)*/)
+          @@vsif_entry_value_quoted_re = Regexp.new(/^(?:<text>|")([^"<]+)(?:<\/text>|")\s*;/)
+          @@vsif_entry_value_plain_re  = Regexp.new(/^([^;"<}]+)\s*;/)
+          @@include_re                 = Regexp.new('^#include\s+\"([^\"]+)\"')
       end
 
       # Read all unique .vsof files of a session and populate the runs member
@@ -229,22 +230,26 @@ module Vmgr
               err = true
             else
               str         = match_key.post_match.strip
-              match_value = @@vsif_entry_value_re.match(str)
+              match_value = @@vsif_entry_value_quoted_re.match(str)
               if match_value then
+                puts "value str #{str} match #{match_value[1]}"
                 match_found = true
-                if match_value[1] then
-                  value = "<text>"+match_value[2]+"</text>"
+                value = "<text>"+match_value[1]+"</text>"
+              else
+                match_value = @@vsif_entry_value_plain_re.match(str)
+                if match_value then
+                  match_found = true
+                  value = match_value[1];
                 else
-                  value = match_value[2];
+                  STDERR.puts "#{name} [ERROR]: attribute '#{key}' for #{container.ctype.to_s} '#{container.name}': could not parse value #{str.red}"
+                  err = true
                 end
-
+              end
+              if match_found then
                 if value.strip.length != 0
                   container.add_attribute(key, value)
                 end
                 str = match_value.post_match.strip
-              else
-                STDERR.puts "#{name} [ERROR]: attribute '#{key}' for #{container.ctype.to_s} '#{container.name}': could not parse value #{str.red}"
-                err = true
               end
             end
           end
@@ -302,7 +307,7 @@ module Vmgr
         end
 
         full_path = File.expand_path(includee, Dir.getwd());
-        if (not File.exist?(full_path)) then
+        if not File.exist?(full_path) then
           includer_path = File.dirname(includer)
           full_path = File.expand_path(includee, includer_path)
         end
@@ -340,8 +345,8 @@ module Vmgr
                   case block_name
                   when "run"
                       # extract the real testname that is hidden in the parent_run attribute
-                      next if (attrib == "test_name")
-                      if (attrib == "parent_run") then
+                      next if attrib == "test_name"
+                      if attrib == "parent_run" then
                         attrib = "test_name"
                       end
                       match = /(\w+)@\d+/.match(value)
